@@ -1,0 +1,691 @@
+/* AuthPage.module.css */
+
+/* ─── CSS Variables ─────────────────────────────────────────────────────────── */
+.body {
+  --teal:      #1D8A8C;
+  --teal-dk:   #14626A;
+  --teal-lt:   #E3F3F4;
+  --orange:    #E8541A;
+  --orange-lt: #FDE9E1;
+  --cream:     #F6F1E9;
+  --cream-dk:  #EDE6DA;
+  --ink:       #1A2E2F;
+  --muted:     #6B8080;
+  --border:    rgba(29,138,140,.18);
+  --white:     #FFFFFF;
+  --shadow:    0 8px 40px rgba(29,138,140,.13);
+
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Decorative background gradients */
+.body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%, rgba(29,138,140,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(232,84,26,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Dot pattern */
+.body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(29,138,140,.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  opacity: .6;
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  z-index: 1;
+  background: var(--white);
+  border-radius: 28px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: rise .55s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── Hero ──────────────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--teal-dk);
+  /* ↓ Reduced vertical padding to compact the header */
+  padding: 1.2rem 2rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,.15);
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,.08);
+  top: -120px; left: 50%;
+  transform: translateX(-50%);
+}
+
+.logoWrap {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  /* ↓ Reduced bottom margin to keep hero compact */
+  margin-bottom: .5rem;
+}
+
+.logoImg {
+  /* ↓ Larger logo (was 100px) */
+  width: 10000px;
+  height: 10000px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: var(--cream);
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  animation: spin-in .6s .1s cubic-bezier(.22,.68,0,1.2) both;
+  
+}
+
+.logoFallback {
+  display: none;
+  /* ↓ Match new logo size */
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: var(--cream);
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+
+@keyframes spin-in {
+  from { opacity: 0; transform: scale(.6) rotate(-15deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+.brandName {
+  font-family: 'DM Sans', sans-serif;
+  /* ↓ Slightly reduced font size (was 1.9rem) */
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -.01em;
+  animation: fade-up .4s .2s both;
+  /* ↓ Tighten vertical spacing */
+  margin-top: .15rem;
+  line-height: 1.2;
+}
+
+.brandBadge {
+  background: var(--orange);
+  color: #fff;
+  padding: 1px 8px 2px;
+  border-radius: 6px;
+  font-size: .9rem;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+.brandSub {
+  /* ↓ Slightly reduced (was .78rem) */
+  font-size: .72rem;
+  color: rgba(255,255,255,.6);
+  margin-top: 2px;
+  letter-spacing: .02em;
+  animation: fade-up .4s .28s both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── Tabs ──────────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  padding: 1.2rem 1.5rem .2rem;
+  animation: fade-up .4s .35s both;
+  border: none;
+  background: transparent;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: .55rem;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid var(--cream-dk);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .25s;
+  user-select: none;
+}
+
+.tab:hover {
+  color: var(--teal);
+}
+
+.activeTab {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+/* ─── User type row ─────────────────────────────────────────────────────────── */
+.typeRow {
+  display: flex;
+  gap: .6rem;
+  padding: 1rem 1.5rem .3rem;
+  animation: fade-up .4s .4s both;
+}
+
+.typeBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .6rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  transition: all .22s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.typeBtn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: var(--teal-lt);
+}
+
+.sel {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: var(--teal-lt);
+}
+
+.selO {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: var(--orange-lt);
+}
+
+.ico {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ─── Form ──────────────────────────────────────────────────────────────────── */
+.formBody {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  animation: fade-up .4s .45s both;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+.label {
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: var(--muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.input {
+  width: 100%;
+  padding: .72rem .9rem .72rem 2.4rem;
+  border: 1.5px solid var(--cream-dk);
+  border-radius: 12px;
+  font-size: .9rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.input:focus {
+  border-color: var(--teal);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(29,138,140,.1);
+}
+
+.input::placeholder { color: #b0bebe; }
+
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color .2s;
+}
+
+.eyeBtn:hover { color: var(--teal); }
+
+.forgot {
+  text-align: right;
+  margin-top: -.3rem;
+}
+
+.forgot a {
+  font-size: .78rem;
+  color: var(--teal);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot a:hover { text-decoration: underline; }
+
+/* ─── Main button ────────────────────────────────────────────────────────────── */
+.btnMain {
+  width: 100%;
+  padding: .85rem;
+  border-radius: 14px;
+  border: none;
+  background: var(--teal-dk);
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  letter-spacing: .01em;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 4px 16px rgba(20,98,106,.3);
+  margin-top: .2rem;
+}
+
+.btnMain:hover:not(:disabled) {
+  background: var(--teal);
+  box-shadow: 0 6px 20px rgba(20,98,106,.35);
+}
+
+.btnMain:active:not(:disabled) { transform: scale(.98); }
+
+.btnMain:disabled { opacity: .85; cursor: not-allowed; }
+
+.orange {
+  background: var(--orange) !important;
+  box-shadow: 0 4px 16px rgba(232,84,26,.3) !important;
+}
+
+.orange:hover:not(:disabled) {
+  background: #d44a12 !important;
+  box-shadow: 0 6px 20px rgba(232,84,26,.35) !important;
+}
+
+/* ─── Shake animation ────────────────────────────────────────────────────────── */
+.shake {
+  animation: shake .4s ease !important;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-6px); }
+  40%     { transform: translateX(6px); }
+  60%     { transform: translateX(-4px); }
+  80%     { transform: translateX(4px); }
+}
+
+/* ─── Divider ─────────────────────────────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  color: var(--muted);
+  font-size: .78rem;
+  margin: .1rem 0;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cream-dk);
+}
+
+/* ─── Social buttons ─────────────────────────────────────────────────────── */
+.socials { display: flex; gap: .6rem; }
+
+.btnSocial {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .65rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--cream-dk);
+  background: var(--white);
+  font-size: .82rem;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.btnSocial:hover {
+  border-color: var(--border);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+/* ─── Card footer ─────────────────────────────────────────────────────────── */
+.cardFooter {
+  text-align: center;
+  padding: 0 1.5rem 1.4rem;
+  font-size: .8rem;
+  color: var(--muted);
+  animation: fade-up .4s .5s both;
+}
+
+.cardFooter a {
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cardFooter a:hover { text-decoration: underline; }
+
+/* ─── Password strength ──────────────────────────────────────────────────── */
+.pwStrength {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.pwBar {
+  height: 3px;
+  flex: 1;
+  border-radius: 99px;
+  background: var(--cream-dk);
+  transition: background .3s;
+}
+
+.weak   { background: #e84949; }
+.fair   { background: var(--orange); }
+.strong { background: var(--teal); }
+
+/* ─── Checkbox row ───────────────────────────────────────────────────────── */
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  font-size: .8rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.checkbox {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 2px;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+.checkRow a { color: var(--teal); text-decoration: none; }
+.checkRow a:hover { text-decoration: underline; }
+
+/* ─── Name row ───────────────────────────────────────────────────────────── */
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Mobile (≤ 480px) ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .body {
+    align-items: flex-start;
+    padding: 0;
+    background: var(--white);
+  }
+
+  .body::after {
+    display: none;
+  }
+
+  .card {
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+    max-width: 100%;
+  }
+
+  .hero {
+    /* ↓ Compact on mobile too */
+    padding: 1rem 1.25rem .85rem;
+  }
+
+  .logoImg,
+  .logoFallback {
+    /* ↓ Bigger than before (was 76px) */
+    width: 96px;
+    height: 96px;
+  }
+
+  .brandName {
+    font-size: 1.4rem;
+  }
+
+  .brandSub {
+    font-size: .7rem;
+  }
+
+  .tabs {
+    padding: 1rem 1.25rem .2rem;
+  }
+
+  .typeRow {
+    padding: .9rem 1.25rem .3rem;
+    gap: .5rem;
+  }
+
+  .typeBtn {
+    padding: .55rem .4rem;
+    font-size: .79rem;
+  }
+
+  .formBody {
+    padding: .85rem 1.25rem 1.25rem;
+    gap: .7rem;
+  }
+
+  .nameRow {
+    grid-template-columns: 1fr;
+  }
+
+  .input {
+    font-size: 1rem;
+    padding: .78rem .9rem .78rem 2.4rem;
+  }
+
+  .btnMain {
+    padding: .9rem;
+    font-size: 1rem;
+  }
+
+  .btnSocial {
+    padding: .7rem .5rem;
+    font-size: .8rem;
+  }
+
+  .cardFooter {
+    padding: 0 1.25rem 1.6rem;
+    font-size: .82rem;
+  }
+}
+
+/* ─── Tablet (481px – 767px) ─────────────────────────────────────────────── */
+@media (min-width: 481px) and (max-width: 767px) {
+  .body {
+    padding: 1.5rem 1rem;
+    align-items: center;
+  }
+
+  .card {
+    max-width: 400px;
+    border-radius: 24px;
+  }
+
+  .hero {
+    padding: 1.2rem 1.75rem 1rem;
+  }
+}
+
+/* ─── Desktop (≥ 768px) ──────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .body {
+    padding: 2rem;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    max-width: 460px;
+    border-radius: 32px;
+    box-shadow:
+      0 12px 60px rgba(29,138,140,.15),
+      0 2px 8px rgba(0,0,0,.06);
+  }
+
+  .hero {
+    /* ↓ Reduced from 2.6rem/2rem to keep header from overflowing */
+    padding: 1.4rem 2.5rem 1.1rem;
+  }
+
+  .logoImg,
+  .logoFallback {
+    /* ↓ Bigger than before (was 112px) */
+    width: 130px;
+    height: 130px;
+  }
+
+  .brandName {
+    font-size: 1.8rem;
+  }
+
+  .tabs {
+    padding: 1.4rem 2rem .25rem;
+  }
+
+  .typeRow {
+    padding: 1.1rem 2rem .4rem;
+  }
+
+  .formBody {
+    padding: 1.1rem 2rem 1.75rem;
+    gap: .85rem;
+  }
+
+  .input {
+    padding: .78rem 1rem .78rem 2.5rem;
+    font-size: .92rem;
+  }
+
+  .btnMain {
+    padding: .9rem;
+    font-size: 1rem;
+    border-radius: 16px;
+  }
+
+  .cardFooter {
+    padding: 0 2rem 1.6rem;
+    font-size: .83rem;
+  }
+}
+
+/* ─── Large desktop (≥ 1280px) ──────────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .body {
+    gap: 4rem;
+  }
+
+  .card {
+    max-width: 480px;
+  }
+}
