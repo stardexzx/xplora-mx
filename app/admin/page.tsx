@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../services/supabase";
 
+//Define la estructura de un negocio
 type Negocio = {
   id: string;
   name: string;
@@ -14,8 +15,11 @@ type Negocio = {
   owner_id: string;
 };
 
+//valores posibles para el estado de un negocio
 type TabType = "pending" | "approved" | "rejected";
 
+
+// Componente principal del panel de administración
 export default function AdminPanel() {
   const router = useRouter();
   const [negocios, setNegocios] = useState<Negocio[]>([]);
@@ -24,51 +28,71 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<TabType>("pending");
   const [actionMsg, setActionMsg] = useState("");
 
+
+  // Verifica que el usuario esté autenticado y sea admin
   useEffect(() => {
     const checkAdmin = async () => {
+      // Verificar autenticación
       const { data: userData } = await supabase.auth.getUser();
+      // Si no hay usuario, redirigir a login
       if (!userData.user) { router.replace("/login"); return; }
+      // Verificar rol de admin
       const { data: profile } = await supabase
         .from("profiles").select("role").eq("id", userData.user.id).single();
+        // Si el rol no es admin, redirigir al mapa
       if (profile?.role !== "admin") { router.replace("/"); return; }
       setAuthChecked(true);
     };
     checkAdmin();
   }, [router]);
 
+// Una vez verificado el admin, carga los negocios según la pestaña activa
   useEffect(() => {
     if (!authChecked) return;
     fetchNegocios(activeTab);
   }, [authChecked, activeTab]);
 
+  // Función para cargar los negocios según su estado
   const fetchNegocios = async (status: TabType) => {
     setLoading(true);
+    // Consulta a Supabase para obtener los negocios con el estado seleccionado
     const { data } = await supabase.from("negocios").select("*")
       .eq("status", status).order("id", { ascending: false });
+      // Actualiza el estado con los negocios obtenidos y desactiva el loading
     setNegocios(data || []);
     setLoading(false);
   };
 
+  // Función para actualizar el estado de un negocio (aprobar o rechazar)
+  // Recibe el ID del negocio y el nuevo estado, realiza la actualización en Supabase
   const updateStatus = async (id: string, status: "approved" | "rejected") => {
+    // Actualiza el estado del negocio en la base de datos
     const { error } = await supabase.from("negocios").update({ status }).eq("id", id);
-    if (error) { setActionMsg("❌ Error: " + error.message); }
+    // Si hay un error, muestra un mensaje de error. Si no, muestra un mensaje de éxito y actualiza la lista de negocios
+    if (error) { setActionMsg("Error: " + error.message); }
     else {
-      setActionMsg(status === "approved" ? "✅ Negocio aprobado" : "❌ Negocio rechazado");
+      // Muestra un mensaje de éxito y actualiza la lista de negocios para reflejar el cambio
+      setActionMsg(status === "approved" ? "Negocio aprobado" : "Negocio rechazado");
+      // Actualiza la lista de negocios en el estado local para reflejar el cambio sin necesidad de recargar toda la lista
       setNegocios(prev => prev.filter(n => n.id !== id));
+      // Limpia el mensaje después de 2.5 segundos
       setTimeout(() => setActionMsg(""), 2500);
     }
   };
 
+// Función para eliminar un negocio permanentemente
   const deleteNegocio = async (id: string) => {
     if (!confirm("¿Eliminar este negocio permanentemente?")) return;
+    // Elimina el negocio de la base de datos y actualiza la lista local
     await supabase.from("negocios").delete().eq("id", id);
     setNegocios(prev => prev.filter(n => n.id !== id));
-    setActionMsg("🗑️ Negocio eliminado");
+    setActionMsg("Negocio eliminado");
     setTimeout(() => setActionMsg(""), 2500);
   };
-
+// Si aún no se ha verificado la autenticación, no renderiza nada (puede mostrar un loader si se desea)
   if (!authChecked) return null;
 
+  // Define las pestañas disponibles en el panel de administración, cada una con su clave, etiqueta y emoji correspondiente
   const tabs: { key: TabType; label: string; emoji: string }[] = [
     { key: "pending",  label: "Pendientes", emoji: "⏳" },
     { key: "approved", label: "Aprobados",  emoji: "✅" },
@@ -76,6 +100,7 @@ export default function AdminPanel() {
   ];
 
   return (
+    // Renderiza el panel de administración con un diseño limpio y funcional, utilizando estilos en línea para mayor control sobre la apariencia
     <>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'DM Sans', sans-serif" }}>
@@ -92,12 +117,12 @@ export default function AdminPanel() {
             display: "flex", alignItems: "center", gap: "8px",
             background: "none", border: "none", cursor: "pointer", color: "var(--text)",
           }}>
-            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, var(--brand), var(--brand-dark))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>🌎</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>Xplora<span style={{ color: "var(--brand)" }}>MX</span></span>
+            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, var(--teal), var(--teal-dk))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>🌎</div>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>Xplora<span style={{ background: "var(--orange)", color: "#fff", padding: "1px 6px 2px", borderRadius: "5px", fontSize: "0.68rem", fontWeight: 700, marginLeft: "4px" }}>MX</span></span>
           </button>
 
           <span style={{ color: "var(--border)", fontSize: "1.2rem" }}>/</span>
-          <h1 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--muted)", margin: 0 }}>🛡️ Panel Admin</h1>
+          <h1 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--muted)", margin: 0 }}>Panel Administrador</h1>
 
           <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
             {/* ← Volver */}
@@ -122,8 +147,8 @@ export default function AdminPanel() {
                 className="btn"
                 style={{
                   fontSize: "0.85rem",
-                  background: activeTab === tab.key ? "rgba(16,185,129,0.15)" : "var(--surface2)",
-                  color: activeTab === tab.key ? "var(--brand-light)" : "var(--muted)",
+                  background: activeTab === tab.key ? "var(--teal-a)" : "var(--surface2)",
+                  color: activeTab === tab.key ? "var(--teal-lt)" : "var(--muted)",
                   border: `1px solid ${activeTab === tab.key ? "rgba(16,185,129,0.3)" : "var(--border)"}`,
                   fontWeight: activeTab === tab.key ? 700 : 400,
                 }}>
@@ -132,7 +157,7 @@ export default function AdminPanel() {
             ))}
           </div>
 
-          {/* MENSAJE ACCIÓN */}
+          {/* Mensaje de acción (aprobación, rechazo, eliminación) */}
           {actionMsg && (
             <div className="badge badge-green animate-fade-up"
               style={{ marginBottom: "1rem", padding: "10px 16px", borderRadius: "10px", fontSize: "0.88rem" }}>
@@ -190,20 +215,20 @@ export default function AdminPanel() {
                   }}>
                     {activeTab === "pending" && (<>
                       <button className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "6px 14px" }}
-                        onClick={() => updateStatus(negocio.id, "approved")}>✅ Aprobar</button>
+                        onClick={() => updateStatus(negocio.id, "approved")}>Aprobar</button>
                       <button className="btn btn-danger" style={{ fontSize: "0.82rem", padding: "6px 14px" }}
-                        onClick={() => updateStatus(negocio.id, "rejected")}>❌ Rechazar</button>
+                        onClick={() => updateStatus(negocio.id, "rejected")}>Rechazar</button>
                     </>)}
                     {activeTab === "rejected" && (
                       <button className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "6px 14px" }}
-                        onClick={() => updateStatus(negocio.id, "approved")}>✅ Aprobar</button>
+                        onClick={() => updateStatus(negocio.id, "approved")}>Aprobar</button>
                     )}
                     {activeTab === "approved" && (
                       <button className="btn" style={{ fontSize: "0.82rem", padding: "6px 14px", background: "rgba(245,158,11,0.15)", color: "var(--warning)", border: "1px solid rgba(245,158,11,0.3)" }}
-                        onClick={() => updateStatus(negocio.id, "rejected")}>⚠️ Suspender</button>
+                        onClick={() => updateStatus(negocio.id, "rejected")}>Suspender</button>
                     )}
                     <button className="btn btn-danger" style={{ fontSize: "0.82rem", padding: "6px 14px", marginLeft: "auto" }}
-                      onClick={() => deleteNegocio(negocio.id)}>🗑️ Eliminar</button>
+                      onClick={() => deleteNegocio(negocio.id)}>Eliminar</button>
                   </div>
                 </div>
               ))}

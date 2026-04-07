@@ -34,7 +34,7 @@ const CATS = [
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   pending:  { label: "En revisión", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-  approved: { label: "Publicado",   color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+  approved: { label: "Publicado",   color: "#10b981", bg: "var(--teal-a)" },
   rejected: { label: "Rechazado",   color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
 };
 
@@ -289,8 +289,8 @@ export default function MisNegocios() {
           position: "sticky", top: 0, zIndex: 100, flexWrap: "wrap",
         }}>
           <button onClick={() => router.push("/")} style={{ display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", cursor: "pointer", color: "var(--text)" }}>
-            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, var(--brand), var(--brand-dark))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>🌎</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>Xplora<span style={{ color: "var(--brand)" }}>MX</span></span>
+            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, var(--teal), var(--teal-dk))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>🌎</div>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>Xplora<span style={{ background: "var(--orange)", color: "#fff", padding: "1px 6px 2px", borderRadius: "5px", fontSize: "0.68rem", fontWeight: 700, marginLeft: "4px" }}>MX</span></span>
           </button>
           <span style={{ color: "var(--border)" }}>/</span>
           <span style={{ color: "var(--muted)", fontSize: "0.9rem", fontWeight: 600 }}>Mis negocios</span>
@@ -333,8 +333,8 @@ export default function MisNegocios() {
                     <div key={n.id} onClick={() => openEdit(n)} style={{
                       display: "flex", gap: "12px", padding: "14px 16px",
                       borderBottom: "1px solid var(--border)", cursor: "pointer",
-                      background: isActive ? "rgba(16,185,129,0.06)" : "transparent",
-                      borderLeft: isActive ? "3px solid var(--brand)" : "3px solid transparent",
+                      background: isActive ? "rgba(29,138,140,0.06)" : "transparent",
+                      borderLeft: isActive ? "3px solid var(--teal)" : "3px solid transparent",
                       transition: "all 0.15s",
                     }}>
                       {/* Thumbnail */}
@@ -384,8 +384,8 @@ export default function MisNegocios() {
                   <button key={tab} onClick={() => setActiveTab(tab)} style={{
                     padding: "12px 20px", border: "none", background: "transparent",
                     cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: "0.85rem",
-                    color: activeTab === tab ? "var(--brand)" : "var(--muted)",
-                    borderBottom: activeTab === tab ? "2px solid var(--brand)" : "2px solid transparent",
+                    color: activeTab === tab ? "var(--teal)" : "var(--muted)",
+                    borderBottom: activeTab === tab ? "2px solid var(--teal)" : "2px solid transparent",
                     transition: "all 0.2s",
                   }}>
                     {tab === "info" ? "Información" : tab === "fotos" ? `Fotos (${currentImages.length})` : `Reseñas (${reviews.length})`}
@@ -410,9 +410,9 @@ export default function MisNegocios() {
                           <button key={c.value} onClick={() => setEditCategory(c.value)} style={{
                             padding: "8px 10px", borderRadius: "8px", border: "1px solid",
                             cursor: "pointer", fontSize: "0.82rem", fontFamily: "inherit",
-                            borderColor: editCategory === c.value ? "var(--brand)" : "var(--border)",
-                            background: editCategory === c.value ? "rgba(16,185,129,0.1)" : "var(--surface2)",
-                            color: editCategory === c.value ? "var(--brand-light)" : "var(--text)",
+                            borderColor: editCategory === c.value ? "var(--teal)" : "var(--border)",
+                            background: editCategory === c.value ? "var(--teal-a)" : "var(--surface2)",
+                            color: editCategory === c.value ? "var(--teal-lt)" : "var(--text)",
                           }}>{c.label}</button>
                         ))}
                       </div>
@@ -490,7 +490,7 @@ export default function MisNegocios() {
                     </div>
 
                     {saveMsg && (
-                      <div style={{ background: saveMsg.startsWith("Error") ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)", border: `1px solid ${saveMsg.startsWith("Error") ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)"}`, borderRadius: "8px", padding: "10px 14px", color: saveMsg.startsWith("Error") ? "var(--danger)" : "var(--brand-light)", fontSize: "0.85rem" }}>
+                      <div style={{ background: saveMsg.startsWith("Error") ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)", border: `1px solid ${saveMsg.startsWith("Error") ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)"}`, borderRadius: "8px", padding: "10px 14px", color: saveMsg.startsWith("Error") ? "var(--danger)" : "var(--teal-lt)", fontSize: "0.85rem" }}>
                         {saveMsg}
                       </div>
                     )}
@@ -521,7 +521,7 @@ export default function MisNegocios() {
                             cursor: "pointer", fontSize: "0.8rem", display: "flex", alignItems: "center", justifyContent: "center",
                           }}>✕</button>
                           {i === 0 && (
-                            <div style={{ position: "absolute", bottom: "6px", left: "6px", background: "rgba(16,185,129,0.9)", color: "white", fontSize: "0.65rem", padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>
+                            <div style={{ position: "absolute", bottom: "6px", left: "6px", background: "var(--teal)", color: "white", fontSize: "0.65rem", padding: "2px 8px", borderRadius: "4px", fontWeight: 600 }}>
                               Principal
                             </div>
                           )}
@@ -530,10 +530,10 @@ export default function MisNegocios() {
 
                       {/* Nuevas fotos preview */}
                       {newPreviews.map((src, i) => (
-                        <div key={`new-${i}`} style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", border: "2px dashed var(--brand)", opacity: 0.8 }}>
+                        <div key={`new-${i}`} style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", border: "2px dashed var(--teal)", opacity: 0.8 }}>
                           <img src={src} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          <div style={{ position: "absolute", inset: 0, background: "rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ color: "var(--brand)", fontWeight: 700, fontSize: "0.75rem" }}>Por subir</span>
+                          <div style={{ position: "absolute", inset: 0, background: "var(--teal-a)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <span style={{ color: "var(--teal)", fontWeight: 700, fontSize: "0.75rem" }}>Por subir</span>
                           </div>
                         </div>
                       ))}
@@ -577,7 +577,7 @@ export default function MisNegocios() {
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                           <div style={{ display: "flex", gap: "4px" }}>
                             {[1,2,3,4,5].map(s => (
-                              <div key={s} style={{ width: "12px", height: "12px", borderRadius: "2px", background: s <= review.rating ? "var(--brand)" : "var(--surface2)" }} />
+                              <div key={s} style={{ width: "12px", height: "12px", borderRadius: "2px", background: s <= review.rating ? "var(--teal)" : "var(--surface2)" }} />
                             ))}
                             <span style={{ fontSize: "0.78rem", color: "var(--muted)", marginLeft: "6px" }}>{review.rating}/5</span>
                           </div>
@@ -599,8 +599,8 @@ export default function MisNegocios() {
 
                         {/* Respuesta existente */}
                         {review.reply && (
-                          <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: "8px", padding: "10px 12px", marginBottom: "8px" }}>
-                            <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--brand)", fontWeight: 600, marginBottom: "4px" }}>Tu respuesta</p>
+                          <div style={{ background: "rgba(29,138,140,0.06)", border: "1px solid var(--teal-a)", borderRadius: "8px", padding: "10px 12px", marginBottom: "8px" }}>
+                            <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--teal)", fontWeight: 600, marginBottom: "4px" }}>Tu respuesta</p>
                             <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text)" }}>{review.reply}</p>
                           </div>
                         )}

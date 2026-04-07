@@ -159,15 +159,15 @@ export default function Dashboard() {
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-      <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "1.5rem" }}>
+      <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "1.5rem", color: "var(--text)" }}>
         <div style={{ maxWidth: "600px", margin: "0 auto" }}>
 
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "linear-gradient(135deg, var(--brand), var(--brand-dark))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem" }}>🌎</div>
+              <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: "linear-gradient(135deg, var(--teal), var(--teal-dk))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem" }}>🌎</div>
               <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.1rem" }}>
-                Xplora<span style={{ color: "var(--brand)" }}>MX</span>
+                Xplora<span style={{ background: "var(--orange)", color: "#fff", padding: "1px 6px 2px", borderRadius: "5px", fontSize: "0.68rem", fontWeight: 700, marginLeft: "4px" }}>MX</span>
               </span>
             </div>
             <button className="btn btn-ghost" onClick={() => router.push("/")} style={{ fontSize: "0.82rem" }}>
@@ -200,7 +200,7 @@ export default function Dashboard() {
                         alignItems: "center", justifyContent: "center",
                       }}>✕</button>
                       {i === 0 && (
-                        <div style={{ position: "absolute", bottom: "4px", left: "4px", background: "rgba(16,185,129,0.85)", color: "white", fontSize: "0.65rem", padding: "2px 6px", borderRadius: "4px", fontWeight: 600 }}>
+                        <div style={{ position: "absolute", bottom: "4px", left: "4px", background: "var(--teal)", color: "white", fontSize: "0.65rem", padding: "2px 6px", borderRadius: "4px", fontWeight: 600 }}>
                           Principal
                         </div>
                       )}
@@ -241,9 +241,9 @@ export default function Dashboard() {
                       padding: "10px 12px", borderRadius: "10px", border: "1px solid",
                       cursor: "pointer", fontWeight: 500, fontSize: "0.85rem", fontFamily: "inherit",
                       textAlign: "left", transition: "all 0.15s",
-                      borderColor: category === c.value ? "var(--brand)" : "var(--border)",
-                      background: category === c.value ? "rgba(16,185,129,0.1)" : "var(--surface2)",
-                      color: category === c.value ? "var(--brand-light)" : "var(--text)",
+                      borderColor: category === c.value ? "var(--teal)" : "var(--border)",
+                      background: category === c.value ? "var(--teal-a)" : "var(--surface2)",
+                      color: category === c.value ? "var(--teal-lt)" : "var(--text)",
                     }}>{c.label}</button>
                   ))}
                 </div>
@@ -341,7 +341,7 @@ export default function Dashboard() {
                     </GoogleMap>
                   ) : (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--muted)", fontSize: "0.85rem", gap: "8px" }}>
-                      <div style={{ width: "16px", height: "16px", border: "2px solid var(--brand)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                      <div style={{ width: "16px", height: "16px", border: "2px solid var(--teal)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                       Cargando mapa...
                     </div>
                   )}
@@ -364,7 +364,7 @@ export default function Dashboard() {
                 </div>
 
                 {markerPos && (
-                  <p style={{ fontSize: "0.75rem", color: "var(--brand)", marginTop: "6px", textAlign: "center" }}>
+                  <p style={{ fontSize: "0.75rem", color: "var(--teal)", marginTop: "6px", textAlign: "center" }}>
                     ✅ Ubicación seleccionada — también puedes arrastrar el pin para ajustar
                   </p>
                 )}
@@ -372,7 +372,7 @@ export default function Dashboard() {
 
               {/* Mensajes */}
               {successMsg && (
-                <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "10px", padding: "12px 16px", color: "var(--brand-light)", fontSize: "0.88rem" }}>
+                <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "10px", padding: "12px 16px", color: "var(--teal-lt)", fontSize: "0.88rem" }}>
                   ✅ {successMsg}
                 </div>
               )}
@@ -382,7 +382,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <button className="btn btn-primary" onClick={createBusiness} disabled={uploading}
+              <button className="btn btn-orange" onClick={createBusiness} disabled={uploading}
                 style={{ width: "100%", padding: "14px", fontSize: "1rem" }}>
                 {uploading ? "⏳ Subiendo..." : "Publicar negocio →"}
               </button>
