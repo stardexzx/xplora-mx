@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
     const params = new URLSearchParams();
     texts.forEach((t) => params.append("text", t));
     params.append("target_lang", targetLang);
+    
+    texts = texts.map((t) => t.slice(0, 200)); // Máximo 200 chars por texto
 
     const res = await fetch("https://api-free.deepl.com/v2/translate", {
       method: "POST",

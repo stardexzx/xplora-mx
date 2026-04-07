@@ -10,6 +10,7 @@ import { translateText } from "../services/translate";
 import { getUserLocation, getDistanceKm, LatLng } from "../services/geo";
 import { useLang, interpolate } from "../context/LangContext";
 import { Negocio } from "../types/negocio";
+import { useTranslatedNegocios } from "../hooks/useTranslatedNegocios";
 
 const RADIO_KM = 5;
 
@@ -98,6 +99,7 @@ const CAT_EMOJI: Record<string, string> = {
 export default function Home() {
   const { t, lang, setLang, ready } = useLang();
   const [negocios, setNegocios] = useState<Negocio[]>([]);
+  const negociosToShow = useTranslatedNegocios(negocios, lang);
   const [todosLosNegocios, setTodos] = useState<Negocio[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -999,7 +1001,7 @@ export default function Home() {
                   </p>
                 </div>
               ) : (
-                negocios.map((n) => {
+                negociosToShow.map((n) => {
                   const emoji =
                     CAT_EMOJI[n.category?.toLowerCase().split(" ")[0]] ?? "🏪";
                   const dist = fmtDist(n.distancia_km);
@@ -1112,7 +1114,7 @@ export default function Home() {
               }}
             >
               <BusinessMap
-                negocios={negocios}
+                negocios={negociosToShow} // ← antes era negocios
                 selectedId={selectedNegocio?.id ?? null}
                 userLocation={userLocation}
                 onSelectNegocio={(n) => setSelected(n)}
