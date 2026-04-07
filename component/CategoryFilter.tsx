@@ -1,20 +1,20 @@
 "use client";
 
 export const CATEGORIES = [
-  { key: "all" },
-  { key: "comida" },
-  { key: "tours" },
-  { key: "hospedaje" },
-  { key: "artesanias" },
-  { key: "entretenimiento" },
+  { key: "all", emoji: "🗺️" },
+  { key: "comida", emoji: "🌮" },
+  { key: "tours", emoji: "🧭" },
+  { key: "hospedaje", emoji: "🏨" },
+  { key: "artesanias", emoji: "🏺" },
+  { key: "entretenimiento", emoji: "🎭" },
 ];
 
 export const CATEGORY_LABELS_ES: Record<string, string> = {
-  all:             "Todos",
-  comida:          "Comida",
-  tours:           "Tours",
-  hospedaje:       "Hospedaje",
-  artesanias:      "Artesanías",
+  all: "Todos",
+  comida: "Comida",
+  tours: "Tours",
+  hospedaje: "Hospedaje",
+  artesanias: "Artesanías",
   entretenimiento: "Entretenimiento",
 };
 
@@ -27,10 +27,20 @@ interface Props {
 export default function CategoryFilter({ active, onChange, labels }: Props) {
   const display = labels ?? CATEGORY_LABELS_ES;
   return (
-    <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "2px" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "8px",
+        overflowX: "auto",
+        paddingBottom: "2px",
+      }}
+    >
       {CATEGORIES.map(({ key }) => (
-        <button key={key} onClick={() => onChange(key)}
-          className={`cat-pill${active === key ? " active" : ""}`}>
+        <button
+          key={key}
+          onClick={() => onChange(key)}
+          className={`cat-pill${active === key ? " active" : ""}`}
+        >
           {display[key]}
         </button>
       ))}

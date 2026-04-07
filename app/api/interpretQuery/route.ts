@@ -1,91 +1,85 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// Lista de tags disponibles
+const AVAILABLE_TAGS = [
+  "barato",
+  "lujo",
+  "seguro",
+  "familiar",
+  "romantico",
+  "turistico",
+  "gastronomico",
+  "cultural",
+  "vida nocturna",
+  "al aire libre",
+  "con niños",
+  "pet friendly",
+  "sin gluten",
+];
 
-//fallback separado (más limpio)
-function fallback(text: string) {
+const AVAILABLE_CATEGORIES = ["comida", "tours", "hospedaje", "artesanias", "entretenimiento"];
+
+// Agrega aliases en simpleSearch
+const CATEGORY_ALIASES: Record<string, string> = {
+  "restaurant": "comida",
+  "comer": "comida",
+  "hotel": "hospedaje",
+  "dormir": "hospedaje",
+  "tour": "tours",
+  "visitar": "tours",
+  "artesania": "artesanias",
+  "recuerdo": "artesanias",
+  "bar": "entretenimiento",
+  "antro": "entretenimiento",
+};
+
+
+// Búsqueda simple en tags, categorías, name, description
+function simpleSearch(text: string): { category: string | null; tags: string[] } {
   const t = text.toLowerCase();
+  const matchedTags: string[] = [];
+  let matchedCategory: string | null = null;
 
-  let filters: any = {};
-  let tags: string[] = [];
+  // Buscar tags
+  for (const tag of AVAILABLE_TAGS) {
+    if (t.includes(tag)) {
+      matchedTags.push(tag);
+    }
+  }
 
-  // categorías
-  if (t.includes("taco") || t.includes("comida")) filters.category = "comida";
-  if (t.includes("bar") || t.includes("discoteca")) filters.category = "bar";
-  if (t.includes("cafe")) filters.category = "cafe";
+  // Buscar categoría
+  for (const category of AVAILABLE_CATEGORIES) {
+    if (t.includes(category)) {
+      matchedCategory = category;
+      break; // Solo una categoría
+    }
+  }
 
-  // rating
-  if (t.includes("bien valorado") || t.includes("bueno")) filters.rating = 4;
+  
+// En simpleSearch, después del loop de categorías:
+for (const [alias, cat] of Object.entries(CATEGORY_ALIASES)) {
+  if (t.includes(alias) && !matchedCategory) {
+    matchedCategory = cat;
+    break;
+  }
+}
 
-  // tags inteligentes
-  if (t.includes("barato")) tags.push("barato");
-  if (t.includes("lujo")) tags.push("lujo");
-  if (t.includes("seguro")) tags.push("seguro");
-  if (t.includes("extranjeros")) tags.push("turistico");
-  if (t.includes("romantico")) tags.push("romantico");
-  if (t.includes("familia")) tags.push("familiar");
-
-  if (tags.length) filters.tags = tags;
-
-  return filters;
+  return {
+    category: matchedCategory,
+    tags: matchedTags,
+  };
 }
 
 export async function POST(req: NextRequest) {
   const { text } = await req.json();
 
   try {
-    const prompt = `
-Convierte esta frase de búsqueda en filtros JSON para una app de negocios locales en México.
+    console.log("🔍 Búsqueda simple para:", text);
+    const result = simpleSearch(text);
 
-Frase: "${text}"
-
-Devuelve SOLO un objeto JSON con esta estructura exacta:
-{
-  "category": null,
-  "rating": null,
-  "tags": []
-}
-
-Reglas:
-- "category": si menciona tipo de negocio, elige UNO de: "comida", "tours", "hospedaje", "artesanias", "entretenimiento". Si no aplica, pon null.
-- "rating": número mínimo de estrellas (1-5) si el usuario pide calidad. Si no aplica, pon null.
-- "tags": array de palabras clave del negocio (ej: ["barato", "romantico"]). Si no hay, pon [].
-
-Solo JSON puro, sin markdown ni explicación.
-`;
-
-    //timeout de 3 segundos
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-
-    const response = await anthropic.messages.create(
-      {
-        model: "claude-3-haiku-20240307",
-        max_tokens: 200,
-        messages: [{ role: "user", content: prompt }],
-      },
-      { signal: controller.signal }
-    );
-
-    clearTimeout(timeout);
-
-    const raw = response.content[0].text;
-    const clean = raw.replace(/```json|```/g, "").trim();
-
-    try {
-      const parsed = JSON.parse(clean);
-      return NextResponse.json({ filters: parsed });
-
-    } catch {
-      console.warn("⚠️ JSON inválido → fallback");
-      return NextResponse.json({ filters: fallback(text) });
-    }
-
+    return NextResponse.json({ filters: result, source: "simple_search" });
   } catch (e) {
-    console.warn("⚠️ Claude falló → fallback inmediato");
-    return NextResponse.json({ filters: fallback(text) });
+    console.error("⚠️ Error en búsqueda:", e);
+    return NextResponse.json({ filters: { category: null, tags: [] }, source: "error" });
   }
 }
