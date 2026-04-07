@@ -16,6 +16,12 @@ const CATS = [
   { value: "entretenimiento", label: "🎶 Entretenimiento" },
 ];
 
+const paymentMethods = [
+  "Efectivo",
+  "Tarjeta",
+  "Transferencia",
+];
+
 const TAGS = [
   "barato",
   "lujo",
@@ -45,6 +51,7 @@ export default function Dashboard() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string[]>([]);
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
   const [openingHours, setOpeningHours] = useState<{
@@ -240,6 +247,7 @@ export default function Dashboard() {
       setCategory("");
       setDescription("");
       setSelectedTags([]);
+      setSelectedPaymentMethod([]);
       setPhone("");
       setWebsite("");
       setOpeningHours({
@@ -579,6 +587,55 @@ export default function Dashboard() {
                       }}
                     >
                       {tag}
+                    </button>
+                  ))}
+                </div>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--muted)",
+                    marginTop: "6px",
+                  }}
+                >
+                  Selecciona todas las que apliquen a tu negocio
+                </p>
+              </div>
+
+              {/* MÉTODOS DE PAGO */}
+              <div>
+                <label style={labelStyle}>Métodos de pago</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {paymentMethods.map((paymentMethod) => (
+                    <button
+                      key={paymentMethod}
+                      onClick={() => {
+                        setSelectedPaymentMethod((prev) =>
+                          prev.includes(paymentMethod)
+                            ? prev.filter((t) => t !== paymentMethod)
+                            : [...prev, paymentMethod],
+                        );
+                      }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid",
+                        cursor: "pointer",
+                        fontWeight: 500,
+                        fontSize: "0.85rem",
+                        fontFamily: "inherit",
+                        transition: "all 0.15s",
+                        borderColor: selectedPaymentMethod.includes(paymentMethod)
+                          ? "var(--teal)"
+                          : "var(--border)",
+                        background: selectedPaymentMethod.includes(paymentMethod)
+                          ? "var(--teal-a)"
+                          : "var(--surface2)",
+                        color: selectedPaymentMethod.includes(paymentMethod)
+                          ? "var(--teal-lt)"
+                          : "var(--text)",
+                      }}
+                    >
+                      {paymentMethod}
                     </button>
                   ))}
                 </div>
