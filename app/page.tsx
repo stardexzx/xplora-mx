@@ -26,31 +26,6 @@ const LANGUAGES = [
   { code: "ar", flag: "AR" },
 ];
 
-// ── Price badge ──────────────────────────────────────────────────────────────
-function PriceBadge({ tags }: { tags?: string }) {
-  if (!tags) return null;
-  const t = tags.toLowerCase();
-  if (t.includes("económico") || t.includes("barato") || t.includes("economico"))
-    return (
-      <span style={{ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:"10px", background:"rgba(16,185,129,0.15)", color:"#10b981", fontSize:"0.72rem", fontWeight:700 }}>
-        $ Económico
-      </span>
-    );
-  if (t.includes("moderado"))
-    return (
-      <span style={{ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:"10px", background:"rgba(245,158,11,0.15)", color:"#f59e0b", fontSize:"0.72rem", fontWeight:700 }}>
-        $$ Moderado
-      </span>
-    );
-  if (t.includes("premium") || t.includes("lujoso"))
-    return (
-      <span style={{ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:"10px", background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.72rem", fontWeight:700 }}>
-        $$$ Premium
-      </span>
-    );
-  return null;
-}
-
 const CAT_EMOJI: Record<string, string> = {
   comida: "🌮",
   tours: "🧭",
@@ -58,6 +33,23 @@ const CAT_EMOJI: Record<string, string> = {
   artesanias: "🏺",
   entretenimiento: "🎭",
 };
+
+// ── Star rating display ──────────────────────────────────────────────────────
+function StarRating({ value }: { value: number }) {
+  const rounded = Math.round(value * 2) / 2; // mitad de estrella
+  return (
+    <span style={{ display: "inline-flex", gap: "1px", alignItems: "center" }}>
+      {[1, 2, 3, 4, 5].map(s => (
+        <svg key={s} width="11" height="11" viewBox="0 0 24 24"
+          fill={s <= rounded ? "#F0D224" : "rgba(255,255,255,0.15)"}
+          stroke={s <= rounded ? "#F0D224" : "rgba(255,255,255,0.2)"}
+          strokeWidth="1">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      ))}
+    </span>
+  );
+}
 
 // ── Main component ───────────────────────────────────────────────────────────
 export default function Home() {
@@ -256,7 +248,6 @@ export default function Home() {
 
         {/* ══ HEADER ══ */}
         <header className="cp-header">
-          {/* Logo row */}
           <div className="cp-header__row">
             <div style={{ display:"flex", alignItems:"center", gap:"8px", flex:1 }}>
               <div className="cp-logo-icon">
@@ -374,7 +365,6 @@ export default function Home() {
         {/* ══ BODY ══ */}
         <div style={{ display:"flex", flex:1, overflow:"hidden", flexDirection:"column" }}>
 
-          {/* Mobile list/map tabs */}
           {isMobile && (
             <div className="cp-tabs">
               {(["list", "map"] as const).map((v) => (
@@ -405,10 +395,7 @@ export default function Home() {
           <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
 
             {/* ── LIST PANEL ── */}
-            <div
-              className="cp-list"
-              style={{ display: isMobile && mobileView !== "list" ? "none" : "flex" }}
-            >
+            <div className="cp-list" style={{ display: isMobile && mobileView !== "list" ? "none" : "flex" }}>
               {nearbyOnly && (
                 <div className="cp-nearby-banner">
                   {interpolate(t.nearbyCount, { n: negocios.length, km: RADIO_KM })}
@@ -434,19 +421,29 @@ export default function Home() {
                       <div style={{ flex:1, minWidth:0 }}>
                         <p className="cp-card__name">{n.name}</p>
                         <p className="cp-card__desc">{n.description?.split(".")[0] ?? n.category}</p>
-                        <PriceBadge tags={n.tags} />
-                      </div>
-                      <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:"5px", flexShrink:0 }}>
-                        {n.rating != null && (
-                          <div style={{ display:"flex", alignItems:"center", gap:"3px" }}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1">
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                            <span style={{ fontSize:"0.8rem", fontWeight:700, color:"var(--text2)" }}>{n.rating.toFixed(1)}</span>
+                        {/* ── Estrellas de calificación ── */}
+                        {n.rating != null && n.rating > 0 ? (
+                          <div style={{ display:"flex", alignItems:"center", gap:"5px", marginTop:"4px" }}>
+                            <StarRating value={n.rating} />
+                            <span style={{ fontSize:"0.75rem", fontWeight:700, color:"#F0D224" }}>
+                              {n.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        ) : (
+                          <div style={{ display:"flex", alignItems:"center", gap:"5px", marginTop:"4px" }}>
+                            <StarRating value={0} />
+                            <span style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)", fontWeight:500 }}>
+                              Sin calificar
+                            </span>
                           </div>
                         )}
-                        {dist && <span style={{ fontSize:"0.75rem", color:"var(--muted)", fontWeight:500 }}>{dist}</span>}
                       </div>
+                      {/* Distancia */}
+                      {dist && (
+                        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", flexShrink:0 }}>
+                          <span style={{ fontSize:"0.75rem", color:"var(--muted)", fontWeight:500 }}>{dist}</span>
+                        </div>
+                      )}
                     </div>
                   );
                 })
