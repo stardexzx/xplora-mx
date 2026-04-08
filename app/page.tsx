@@ -299,8 +299,11 @@ export default function Home() {
                 {showUserMenu && (
                   <div className="cp-drop">
                     {[
-                      { label:"Mis negocios", href:"/mis-negocios" },
-                      { label:"Registrar negocio", href:"/dashboard" },
+                      { label:"Mi perfil", href:"/perfil" },
+                      ...(user?.user_metadata?.user_type === "negocio" ? [
+                        { label:"Mis negocios", href:"/mis-negocios" },
+                        { label:"Registrar negocio", href:"/dashboard" },
+                      ] : []),
                       ...(isAdmin ? [{ label:"Panel admin", href:"/admin" }] : []),
                     ].map((item) => (
                       <button key={item.href} className="cp-dbtn" onClick={() => { window.location.href = item.href; setShowUserMenu(false); }}>
@@ -476,7 +479,7 @@ export default function Home() {
                 </svg>
                 QR
               </button>
-              {user && (
+              {user && user?.user_metadata?.user_type === "negocio" && (
                 <button className="cp-fab" onClick={() => (window.location.href = "/dashboard")}>
                   + Registrar negocio
                 </button>
