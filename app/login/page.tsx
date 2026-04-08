@@ -42,7 +42,7 @@ const UserIcon = () => (
 );
 const PhoneIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
   </svg>
 );
 const EyeIcon = () => (
@@ -139,7 +139,6 @@ export default function AuthPage() {
       return;
     }
 
-    // ── Guarda datos adicionales en user_metadata de auth.users ──
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
         first_name: regFirstName,
@@ -162,7 +161,7 @@ export default function AuthPage() {
   const pwStrength = getPasswordStrength(regPassword);
 
   const loginBtnClass = [styles.btnMain, shake && tab === "login" ? styles.shake : ""].filter(Boolean).join(" ");
-  const regBtnClass   = [styles.btnMain, userType === "negocio" ? styles.orange : "", shake && tab === "register" ? styles.shake : ""].filter(Boolean).join(" ");
+  const regBtnClass   = [styles.btnMain, userType === "negocio" ? styles.yellow : "", shake && tab === "register" ? styles.shake : ""].filter(Boolean).join(" ");
 
   return (
     <div className={styles.body}>
@@ -171,82 +170,103 @@ export default function AuthPage() {
         {/* HERO */}
         <div className={styles.hero}>
           <div className={styles.logoWrap}>
-            <img src="/logo.png" alt="Xplora MX logo" className={styles.logoImg}
+            <img
+              src="/logo.png"
+              alt="Xplora MX logo"
+              className={styles.logoImg}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
                 (e.currentTarget.nextSibling as HTMLElement).style.display = "flex";
-              }} />
+              }}
+            />
             <div className={styles.logoFallback}>🧭</div>
           </div>
-          <div className={styles.brandName}>Xplora <span className={styles.brandBadge}>MX</span></div>
+          <div className={styles.brandName}>
+            Xplora <span className={styles.brandBadge}>MX</span>
+          </div>
           <div className={styles.brandSub}>Conectando turistas con lo auténtico de México</div>
         </div>
 
         {/* TABS */}
         <div className={styles.tabs}>
-          <button className={`${styles.tab} ${tab === "login" ? styles.activeTab : ""}`} onClick={() => { setTab("login"); setLoginError(""); }}>
+          <button
+            className={`${styles.tab} ${tab === "login" ? styles.activeTab : ""}`}
+            onClick={() => { setTab("login"); setLoginError(""); }}
+          >
             Iniciar sesión
           </button>
-          <button className={`${styles.tab} ${tab === "register" ? styles.activeTab : ""}`} onClick={() => { setTab("register"); setRegError(""); }}>
+          <button
+            className={`${styles.tab} ${tab === "register" ? styles.activeTab : ""}`}
+            onClick={() => { setTab("register"); setRegError(""); }}
+          >
             Crear cuenta
           </button>
         </div>
 
         {/* ── LOGIN ── */}
-        {/* ── LOGIN ── */}
-{tab === "login" && (
-  <>
-    <div className={styles.formBody}>
-      <div className={styles.field}>
-        <label className={styles.label}>Correo electrónico</label>
-        <div className={styles.inputWrap}>
-          <span className={styles.inputIcon}><MailIcon /></span>
-          <input type="email" className={styles.input} placeholder="correo@ejemplo.com"
-            value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleLogin()}
-            autoComplete="email" />
-        </div>
-      </div>
+        {tab === "login" && (
+          <>
+            <div className={styles.formBody}>
+              <div className={styles.field}>
+                <label className={styles.label}>Correo electrónico</label>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}><MailIcon /></span>
+                  <input
+                    type="email" className={styles.input}
+                    placeholder="correo@ejemplo.com"
+                    value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleLogin()}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
 
-      <div className={styles.field}>
-        <label className={styles.label}>Contraseña</label>
-        <div className={styles.inputWrap}>
-          <span className={styles.inputIcon}><LockIcon /></span>
-          <input type={showLoginPw ? "text" : "password"} className={styles.input}
-            placeholder="Tu contraseña" value={loginPassword}
-            onChange={e => setLoginPassword(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleLogin()}
-            autoComplete="current-password" />
-          <button type="button" className={styles.eyeBtn} onClick={() => setShowLoginPw(v => !v)}>
-            {showLoginPw ? <EyeOffIcon /> : <EyeIcon />}
-          </button>
-        </div>
-      </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Contraseña</label>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}><LockIcon /></span>
+                  <input
+                    type={showLoginPw ? "text" : "password"} className={styles.input}
+                    placeholder="Tu contraseña" value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleLogin()}
+                    autoComplete="current-password"
+                  />
+                  <button type="button" className={styles.eyeBtn} onClick={() => setShowLoginPw(v => !v)}>
+                    {showLoginPw ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                </div>
+              </div>
 
-      {loginError && (
-        <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:"8px", padding:"8px 12px", color:"#C13515", fontSize:"0.82rem" }}>
-          {loginError}
-        </div>
-      )}
+              {loginError && (
+                <div className={styles.errorBox}>{loginError}</div>
+              )}
 
-      <button className={loginBtnClass} onClick={handleLogin} disabled={loginStatus !== "idle"}>
-        {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Entrar a Xplora MX"}
-      </button>
-    </div>
+              <button className={loginBtnClass} onClick={handleLogin} disabled={loginStatus !== "idle"}>
+                {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Entrar a Xplora MX"}
+              </button>
+            </div>
 
-    <div className={styles.cardFooter}>
-      ¿Sin cuenta? <a onClick={() => setTab("register")} style={{ cursor:"pointer" }}>Regístrate gratis</a>
-    </div>
-  </>
-)}
+            <div className={styles.cardFooter}>
+              ¿Sin cuenta? <a onClick={() => setTab("register")} style={{ cursor: "pointer" }}>Regístrate gratis</a>
+            </div>
+          </>
+        )}
+
         {/* ── REGISTER ── */}
         {tab === "register" && (
           <>
             <div className={styles.typeRow}>
-              <button className={`${styles.typeBtn} ${userType === "turista" ? styles.sel : ""}`} onClick={() => setUserType("turista")}>
+              <button
+                className={`${styles.typeBtn} ${userType === "turista" ? styles.sel : ""}`}
+                onClick={() => setUserType("turista")}
+              >
                 <span className={styles.ico}>🧳</span> Turista
               </button>
-              <button className={`${styles.typeBtn} ${userType === "negocio" ? styles.selO : ""}`} onClick={() => setUserType("negocio")}>
+              <button
+                className={`${styles.typeBtn} ${userType === "negocio" ? styles.selY : ""}`}
+                onClick={() => setUserType("negocio")}
+              >
                 <span className={styles.ico}>🏪</span> Negocio
               </button>
             </div>
@@ -282,7 +302,6 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              {/* ── TELÉFONO ── */}
               <div className={styles.field}>
                 <label className={styles.label}>Teléfono celular</label>
                 <div className={styles.inputWrap}>
@@ -298,17 +317,19 @@ export default function AuthPage() {
                 <label className={styles.label}>Contraseña</label>
                 <div className={styles.inputWrap}>
                   <span className={styles.inputIcon}><LockIcon /></span>
-                  <input type={showRegPw ? "text" : "password"} className={styles.input}
+                  <input
+                    type={showRegPw ? "text" : "password"} className={styles.input}
                     placeholder="Mínimo 6 caracteres" value={regPassword}
                     onChange={e => setRegPassword(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleRegister()}
-                    autoComplete="new-password" />
+                    autoComplete="new-password"
+                  />
                   <button type="button" className={styles.eyeBtn} onClick={() => setShowRegPw(v => !v)}>
                     {showRegPw ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
                 <div className={styles.pwStrength}>
-                  {[0,1,2,3].map(i => <div key={i} className={strengthClass(pwStrength, i)} />)}
+                  {[0, 1, 2, 3].map(i => <div key={i} className={strengthClass(pwStrength, i)} />)}
                 </div>
               </div>
 
@@ -321,9 +342,7 @@ export default function AuthPage() {
               </div>
 
               {regError && (
-                <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:"8px", padding:"8px 12px", color:"#C13515", fontSize:"0.82rem" }}>
-                  {regError}
-                </div>
+                <div className={styles.errorBox}>{regError}</div>
               )}
 
               <button className={regBtnClass} onClick={handleRegister} disabled={regStatus !== "idle"}>
@@ -332,7 +351,7 @@ export default function AuthPage() {
             </div>
 
             <div className={styles.cardFooter}>
-              ¿Ya tienes cuenta? <a onClick={() => setTab("login")} style={{ cursor:"pointer" }}>Inicia sesión</a>
+              ¿Ya tienes cuenta? <a onClick={() => setTab("login")} style={{ cursor: "pointer" }}>Inicia sesión</a>
             </div>
           </>
         )}
