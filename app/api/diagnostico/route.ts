@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
 
 export async function POST(req: NextRequest) {
   const { negocioId, prompt } = await req.json();
@@ -15,14 +10,44 @@ export async function POST(req: NextRequest) {
   );
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307", // el más barato, ~$0.001 por diagnóstico
-      max_tokens: 800,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const MODELS = [
+  "openrouter/free",           // router automático — elige el disponible
+  "google/gemma-3-27b-it:free",
+  "meta-llama/llama-4-scout:free",
+  "mistralai/mistral-small-3.1-24b-instruct:free",
+];
 
-    const raw = response.content[0].text.replace(/```json|```/g, "").trim();
-    console.log("Claude raw:", raw);
+let aiData: any = null;
+
+for (const model of MODELS) {
+  const aiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "HTTP-Referer": "https://xploramx.com",
+      "X-Title": "XploraMX",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800,
+    }),
+  });
+
+  aiData = await aiRes.json();
+  console.log(`[${model}]:`, aiData.error?.message ?? "OK");
+  if (!aiData.error) break;
+}
+
+if (!aiData || aiData.error) {
+  return NextResponse.json({ error: "Todos los modelos fallaron" }, { status: 500 });
+}
+
+const raw = aiData.choices[0].message.content
+  .replace(/```json|```/g, "")
+  .trim();
+
     const diagnostico = JSON.parse(raw);
 
     await supabase.from("diagnosticos").insert({
@@ -34,7 +59,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ diagnostico });
 
   } catch (e) {
-    console.error("Error diagnóstico:", e);
-    return NextResponse.json({ error: "No se pudo generar el diagnóstico" }, { status: 500 });
+    console.error("OpenRouter error:", e);
+    return NextResponse.json({ error: "Error generando diagnóstico" }, { status: 500 });
   }
 }
