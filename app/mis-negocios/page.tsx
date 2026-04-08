@@ -1,5 +1,6 @@
 "use client";
 
+import ChatbotNegocios from "@/component/ChatbotWidgetNegocios";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleMap, Marker } from "@react-google-maps/api";
@@ -111,8 +112,8 @@ export default function MisNegocios() {
   const [editMarker, setEditMarker]           = useState<{ lat: number; lng: number } | null>(null);
   const [editCenter, setEditCenter]           = useState({ lat: 19.0414, lng: -98.2063 });
 
-  const [selectedTags, setSelectedTags]         = useState<string[]>([]);
-  const [schedule, setSchedule]                 = useState<WeekSchedule>({ ...DEFAULT_SCHEDULE });
+  const [selectedTags, setSelectedTags]   = useState<string[]>([]);
+  const [schedule, setSchedule]           = useState<WeekSchedule>({ ...DEFAULT_SCHEDULE });
 
   const [saving, setSaving]   = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
@@ -169,9 +170,9 @@ export default function MisNegocios() {
 
   const closeEdit = () => { setEditingId(null); setSaveMsg(""); };
 
-  const toggleTag     = (t: string) => setSelectedTags(p => p.includes(t) ? p.filter(x => x !== t) : [...p, t]);
-  const toggleDay     = (day: string) => setSchedule(p => ({ ...p, [day]: { ...p[day], open: !p[day].open } }));
-  const setDayTime    = (day: string, field: "from" | "to", val: string) =>
+  const toggleTag  = (t: string) => setSelectedTags(p => p.includes(t) ? p.filter(x => x !== t) : [...p, t]);
+  const toggleDay  = (day: string) => setSchedule(p => ({ ...p, [day]: { ...p[day], open: !p[day].open } }));
+  const setDayTime = (day: string, field: "from" | "to", val: string) =>
     setSchedule(p => ({ ...p, [day]: { ...p[day], [field]: val } }));
 
   const saveInfo = async () => {
@@ -243,7 +244,10 @@ export default function MisNegocios() {
     if (!reply) return;
     setSavingReply(reviewId);
     const { error } = await supabase.from("reviews").update({ reply }).eq("id", reviewId);
-    if (!error) { setReviews(p => p.map(r => r.id === reviewId ? { ...r, reply } : r)); setReplyText(p => ({ ...p, [reviewId]: "" })); }
+    if (!error) {
+      setReviews(p => p.map(r => r.id === reviewId ? { ...r, reply } : r));
+      setReplyText(p => ({ ...p, [reviewId]: "" }));
+    }
     setSavingReply(null);
   };
 
@@ -287,7 +291,7 @@ export default function MisNegocios() {
           </div>
         </div>
 
-        {/* LAYOUT */}
+        {/* ── LAYOUT: sidebar | panel | chatbot ── */}
         <div className={`${s.layout} ${isMobile ? s.layoutMobile : ""}`}>
 
           {/* SIDEBAR */}
@@ -297,29 +301,38 @@ export default function MisNegocios() {
             ) : negocios.length === 0 ? (
               <div className={s.sidebarEmpty}>
                 <p className={s.sidebarEmptyText}>No tienes negocios registrados</p>
-                <button className={s.btnPrimary} style={{ fontSize: "0.85rem" }}
-                  onClick={() => router.push("/dashboard")}>Registrar mi primer negocio</button>
+                <button
+                  className={s.btnPrimary}
+                  style={{ fontSize: "0.85rem" }}
+                  onClick={() => router.push("/dashboard")}
+                >
+                  Registrar mi primer negocio
+                </button>
               </div>
             ) : negocios.map(n => {
               const st = STATUS_LABELS[n.status] ?? STATUS_LABELS.pending;
               return (
-                <div key={n.id}
+                <div
+                  key={n.id}
                   className={`${s.negocioItem} ${editingId === n.id ? s.negocioItemActive : ""}`}
-                  onClick={() => openEdit(n)}>
+                  onClick={() => openEdit(n)}
+                >
                   <div className={s.negocioThumb}>
                     {n.image_url ? <img src={n.image_url} alt={n.name} /> : "🏪"}
                   </div>
                   <div className={s.negocioInfo}>
                     <p className={s.negocioName}>{n.name}</p>
                     <p className={s.negocioCategory}>{n.category}</p>
-                    <span className={s.statusBadge} style={{ background: st.bg, color: st.color }}>{st.label}</span>
+                    <span className={s.statusBadge} style={{ background: st.bg, color: st.color }}>
+                      {st.label}
+                    </span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* PANEL */}
+          {/* PANEL central */}
           {editingNegocio ? (
             <div className={`${s.editPanel} ${isMobile ? s.editPanelMobile : ""}`}>
 
@@ -329,7 +342,10 @@ export default function MisNegocios() {
                   <p className={s.editSubtitle}>{editingNegocio.category}</p>
                 </div>
                 <div className={s.editHeaderActions}>
-                  <button className={s.btnDanger} onClick={() => deleteNegocio(editingNegocio.id, editingNegocio.name)}>
+                  <button
+                    className={s.btnDanger}
+                    onClick={() => deleteNegocio(editingNegocio.id, editingNegocio.name)}
+                  >
                     Eliminar negocio
                   </button>
                   <button className={s.btnGhost} onClick={closeEdit}>✕</button>
@@ -339,8 +355,16 @@ export default function MisNegocios() {
               {/* Tabs */}
               <div className={s.tabs}>
                 {(["info", "fotos", "resenas"] as const).map(tab => (
-                  <button key={tab} className={`${s.tab} ${activeTab === tab ? s.tabActive : ""}`} onClick={() => setActiveTab(tab)}>
-                    {tab === "info" ? "Información" : tab === "fotos" ? `Fotos (${currentImages.length})` : `Reseñas (${reviews.length})`}
+                  <button
+                    key={tab}
+                    className={`${s.tab} ${activeTab === tab ? s.tabActive : ""}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab === "info"
+                      ? "Información"
+                      : tab === "fotos"
+                      ? `Fotos (${currentImages.length})`
+                      : `Reseñas (${reviews.length})`}
                   </button>
                 ))}
               </div>
@@ -360,17 +384,25 @@ export default function MisNegocios() {
                       <label className={s.label}>Categoría</label>
                       <div className={s.catGrid}>
                         {CATS.map(c => (
-                          <button key={c.value}
+                          <button
+                            key={c.value}
                             className={`${s.catBtn} ${editCategory === c.value ? s.catBtnActive : ""}`}
-                            onClick={() => setEditCategory(c.value)}>{c.label}</button>
+                            onClick={() => setEditCategory(c.value)}
+                          >
+                            {c.label}
+                          </button>
                         ))}
                       </div>
                     </div>
 
                     <div>
                       <label className={s.label}>Descripción</label>
-                      <textarea className={`${s.input} ${s.textarea}`} rows={3}
-                        value={editDescription} onChange={e => setEditDescription(e.target.value)} />
+                      <textarea
+                        className={`${s.input} ${s.textarea}`}
+                        rows={3}
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                      />
                     </div>
 
                     {/* ETIQUETAS */}
@@ -378,9 +410,13 @@ export default function MisNegocios() {
                       <label className={s.label}>Etiquetas</label>
                       <div className={s.chipGrid}>
                         {TAGS_OPTIONS.map(tag => (
-                          <button key={tag}
+                          <button
+                            key={tag}
                             className={`${s.chip} ${selectedTags.includes(tag) ? s.chipActive : ""}`}
-                            onClick={() => toggleTag(tag)}>{tag}</button>
+                            onClick={() => toggleTag(tag)}
+                          >
+                            {tag}
+                          </button>
                         ))}
                       </div>
                       <p className={s.chipHint}>Selecciona todas las que apliquen a tu negocio</p>
@@ -388,14 +424,22 @@ export default function MisNegocios() {
 
                     <div>
                       <label className={s.label}>Teléfono / WhatsApp</label>
-                      <input className={s.input} placeholder="+52 222 123 4567"
-                        value={editPhone} onChange={e => setEditPhone(e.target.value)} />
+                      <input
+                        className={s.input}
+                        placeholder="+52 222 123 4567"
+                        value={editPhone}
+                        onChange={e => setEditPhone(e.target.value)}
+                      />
                     </div>
 
                     <div>
                       <label className={s.label}>Sitio web</label>
-                      <input className={s.input} placeholder="www.minegocio.mx"
-                        value={editWebsite} onChange={e => setEditWebsite(e.target.value)} />
+                      <input
+                        className={s.input}
+                        placeholder="www.minegocio.mx"
+                        value={editWebsite}
+                        onChange={e => setEditWebsite(e.target.value)}
+                      />
                     </div>
 
                     {/* HORARIO */}
@@ -405,9 +449,17 @@ export default function MisNegocios() {
                         {DAYS.map(day => {
                           const d = schedule[day];
                           return (
-                            <div key={day} className={`${s.scheduleRow} ${!d.open ? s.scheduleRowClosed : ""}`}>
+                            <div
+                              key={day}
+                              className={`${s.scheduleRow} ${!d.open ? s.scheduleRowClosed : ""}`}
+                            >
                               <label className={s.scheduleCheck}>
-                                <input type="checkbox" checked={d.open} onChange={() => toggleDay(day)} className={s.checkboxInput} />
+                                <input
+                                  type="checkbox"
+                                  checked={d.open}
+                                  onChange={() => toggleDay(day)}
+                                  className={s.checkboxInput}
+                                />
                                 <span className={`${s.checkboxCustom} ${d.open ? s.checkboxChecked : ""}`}>
                                   {d.open && (
                                     <svg viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 10, height: 10 }}>
@@ -419,9 +471,19 @@ export default function MisNegocios() {
                               </label>
                               {d.open ? (
                                 <div className={s.scheduleTimes}>
-                                  <input type="time" value={d.from} onChange={e => setDayTime(day, "from", e.target.value)} className={s.timeInput} />
+                                  <input
+                                    type="time"
+                                    value={d.from}
+                                    onChange={e => setDayTime(day, "from", e.target.value)}
+                                    className={s.timeInput}
+                                  />
                                   <span className={s.timeSep}>—</span>
-                                  <input type="time" value={d.to} onChange={e => setDayTime(day, "to", e.target.value)} className={s.timeInput} />
+                                  <input
+                                    type="time"
+                                    value={d.to}
+                                    onChange={e => setDayTime(day, "to", e.target.value)}
+                                    className={s.timeInput}
+                                  />
                                 </div>
                               ) : (
                                 <span className={s.scheduleClosed}>Cerrado</span>
@@ -437,16 +499,32 @@ export default function MisNegocios() {
                       <label className={s.label}>Ubicación</label>
                       <div className={s.mapWrap}>
                         {mapLoaded ? (
-                          <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }}
-                            center={editCenter} zoom={editMarker ? 15 : 13} onClick={handleMapClick}
-                            options={{ styles: darkMapStyle, zoomControl: true, streetViewControl: false, mapTypeControl: false, fullscreenControl: false }}>
+                          <GoogleMap
+                            mapContainerStyle={{ width: "100%", height: "100%" }}
+                            center={editCenter}
+                            zoom={editMarker ? 15 : 13}
+                            onClick={handleMapClick}
+                            options={{
+                              styles: darkMapStyle,
+                              zoomControl: true,
+                              streetViewControl: false,
+                              mapTypeControl: false,
+                              fullscreenControl: false,
+                            }}
+                          >
                             {editMarker && (
-                              <Marker position={editMarker} draggable onDragEnd={e => {
-                                if (!e.latLng) return;
-                                const lat = parseFloat(e.latLng.lat().toFixed(7));
-                                const lng = parseFloat(e.latLng.lng().toFixed(7));
-                                setEditMarker({ lat, lng }); setEditLat(String(lat)); setEditLng(String(lng));
-                              }} />
+                              <Marker
+                                position={editMarker}
+                                draggable
+                                onDragEnd={e => {
+                                  if (!e.latLng) return;
+                                  const lat = parseFloat(e.latLng.lat().toFixed(7));
+                                  const lng = parseFloat(e.latLng.lng().toFixed(7));
+                                  setEditMarker({ lat, lng });
+                                  setEditLat(String(lat));
+                                  setEditLng(String(lng));
+                                }}
+                              />
                             )}
                           </GoogleMap>
                         ) : "Cargando mapa..."}
@@ -454,13 +532,29 @@ export default function MisNegocios() {
                       <div className={s.coordGrid}>
                         <div>
                           <label className={`${s.label} ${s.labelSm}`}>Latitud</label>
-                          <input className={s.input} value={editLat} style={{ fontSize: "0.85rem" }}
-                            onChange={e => { setEditLat(e.target.value); const n = parseFloat(e.target.value), l = parseFloat(editLng); if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: n, lng: l }); setEditCenter({ lat: n, lng: l }); } }} />
+                          <input
+                            className={s.input}
+                            value={editLat}
+                            style={{ fontSize: "0.85rem" }}
+                            onChange={e => {
+                              setEditLat(e.target.value);
+                              const n = parseFloat(e.target.value), l = parseFloat(editLng);
+                              if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: n, lng: l }); setEditCenter({ lat: n, lng: l }); }
+                            }}
+                          />
                         </div>
                         <div>
                           <label className={`${s.label} ${s.labelSm}`}>Longitud</label>
-                          <input className={s.input} value={editLng} style={{ fontSize: "0.85rem" }}
-                            onChange={e => { setEditLng(e.target.value); const n = parseFloat(e.target.value), l = parseFloat(editLat); if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: l, lng: n }); setEditCenter({ lat: l, lng: n }); } }} />
+                          <input
+                            className={s.input}
+                            value={editLng}
+                            style={{ fontSize: "0.85rem" }}
+                            onChange={e => {
+                              setEditLng(e.target.value);
+                              const n = parseFloat(e.target.value), l = parseFloat(editLat);
+                              if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: l, lng: n }); setEditCenter({ lat: l, lng: n }); }
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -480,7 +574,9 @@ export default function MisNegocios() {
                 {/* ═══ TAB FOTOS ═══ */}
                 {activeTab === "fotos" && (
                   <div className={s.editForm}>
-                    <p className={s.photosHint}>Tienes {currentImages.length} foto{currentImages.length !== 1 ? "s" : ""}. Máximo 6.</p>
+                    <p className={s.photosHint}>
+                      Tienes {currentImages.length} foto{currentImages.length !== 1 ? "s" : ""}. Máximo 6.
+                    </p>
                     <div className={s.photoGrid}>
                       {currentImages.map((img, i) => (
                         <div key={img.id} className={s.photoItem}>
@@ -492,7 +588,9 @@ export default function MisNegocios() {
                       {newPreviews.map((src, i) => (
                         <div key={`new-${i}`} className={s.photoNew}>
                           <img src={src} alt="" />
-                          <div className={s.photoNewOverlay}><span className={s.photoNewLabel}>Por subir</span></div>
+                          <div className={s.photoNewOverlay}>
+                            <span className={s.photoNewLabel}>Por subir</span>
+                          </div>
                         </div>
                       ))}
                       {(currentImages.length + newPreviews.length) < 6 && (
@@ -502,10 +600,19 @@ export default function MisNegocios() {
                         </div>
                       )}
                     </div>
-                    <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleNewFiles} style={{ display: "none" }} />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleNewFiles}
+                      style={{ display: "none" }}
+                    />
                     {newFiles.length > 0 && (
                       <button className={s.btnPrimary} onClick={uploadNewPhotos} disabled={uploadingPhotos}>
-                        {uploadingPhotos ? "Subiendo fotos..." : `Subir ${newFiles.length} foto${newFiles.length > 1 ? "s" : ""}`}
+                        {uploadingPhotos
+                          ? "Subiendo fotos..."
+                          : `Subir ${newFiles.length} foto${newFiles.length > 1 ? "s" : ""}`}
                       </button>
                     )}
                   </div>
@@ -514,45 +621,61 @@ export default function MisNegocios() {
                 {/* ═══ TAB RESEÑAS ═══ */}
                 {activeTab === "resenas" && (
                   <div className={s.editForm}>
-                    {loadingReviews ? <p className={s.loadingText}>Cargando reseñas...</p>
-                      : reviews.length === 0 ? <p style={{ color: "rgba(255,255,255,0.42)", textAlign: "center", padding: "2rem" }}>Aún no tienes reseñas</p>
-                      : reviews.map(review => (
-                        <div key={review.id} className={s.reviewCard}>
-                          <div className={s.reviewTopRow}>
-                            <div className={s.reviewStars}>
-                              {[1,2,3,4,5].map(star => (
-                                <div key={star} className={`${s.reviewStar} ${star <= review.rating ? s.reviewStarFilled : s.reviewStarEmpty}`} />
-                              ))}
-                              <span className={s.reviewRatingLabel}>{review.rating}/5</span>
-                            </div>
-                            <div className={s.reviewActions}>
-                              <span className={s.reviewDate}>{new Date(review.created_at).toLocaleDateString("es-MX")}</span>
-                              <button className={s.btnDeleteReview} onClick={() => deleteReview(review.id)}>Eliminar</button>
-                            </div>
+                    {loadingReviews ? (
+                      <p className={s.loadingText}>Cargando reseñas...</p>
+                    ) : reviews.length === 0 ? (
+                      <p style={{ color: "rgba(255,255,255,0.42)", textAlign: "center", padding: "2rem" }}>
+                        Aún no tienes reseñas
+                      </p>
+                    ) : reviews.map(review => (
+                      <div key={review.id} className={s.reviewCard}>
+                        <div className={s.reviewTopRow}>
+                          <div className={s.reviewStars}>
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <div
+                                key={star}
+                                className={`${s.reviewStar} ${star <= review.rating ? s.reviewStarFilled : s.reviewStarEmpty}`}
+                              />
+                            ))}
+                            <span className={s.reviewRatingLabel}>{review.rating}/5</span>
                           </div>
-                          {review.comment && <p className={s.reviewComment}>{review.comment}</p>}
-                          {review.reply && (
-                            <div className={s.reviewReply}>
-                              <p className={s.reviewReplyLabel}>Tu respuesta</p>
-                              <p className={s.reviewReplyText}>{review.reply}</p>
-                            </div>
-                          )}
-                          <div className={s.reviewReplyRow}>
-                            <input className={`${s.input} ${s.reviewReplyInput}`}
-                              placeholder={review.reply ? "Editar respuesta..." : "Responder..."}
-                              value={replyText[review.id] ?? ""}
-                              onChange={e => setReplyText(p => ({ ...p, [review.id]: e.target.value }))}
-                              onKeyDown={e => e.key === "Enter" && saveReply(review.id)} />
-                            <button className={s.btnPrimarySmall}
-                              disabled={savingReply === review.id || !replyText[review.id]?.trim()}
-                              onClick={() => saveReply(review.id)}>
-                              {savingReply === review.id ? "..." : review.reply ? "Editar" : "Responder"}
+                          <div className={s.reviewActions}>
+                            <span className={s.reviewDate}>
+                              {new Date(review.created_at).toLocaleDateString("es-MX")}
+                            </span>
+                            <button className={s.btnDeleteReview} onClick={() => deleteReview(review.id)}>
+                              Eliminar
                             </button>
                           </div>
                         </div>
-                      ))}
+                        {review.comment && <p className={s.reviewComment}>{review.comment}</p>}
+                        {review.reply && (
+                          <div className={s.reviewReply}>
+                            <p className={s.reviewReplyLabel}>Tu respuesta</p>
+                            <p className={s.reviewReplyText}>{review.reply}</p>
+                          </div>
+                        )}
+                        <div className={s.reviewReplyRow}>
+                          <input
+                            className={`${s.input} ${s.reviewReplyInput}`}
+                            placeholder={review.reply ? "Editar respuesta..." : "Responder..."}
+                            value={replyText[review.id] ?? ""}
+                            onChange={e => setReplyText(p => ({ ...p, [review.id]: e.target.value }))}
+                            onKeyDown={e => e.key === "Enter" && saveReply(review.id)}
+                          />
+                          <button
+                            className={s.btnPrimarySmall}
+                            disabled={savingReply === review.id || !replyText[review.id]?.trim()}
+                            onClick={() => saveReply(review.id)}
+                          >
+                            {savingReply === review.id ? "..." : review.reply ? "Editar" : "Responder"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
+
               </div>
             </div>
 
@@ -561,7 +684,12 @@ export default function MisNegocios() {
               <p className={s.emptyStateText}>Selecciona un negocio para editar</p>
             </div>
           )}
-        </div>
+
+          {/* CHATBOT — 3ª columna, solo desktop */}
+          {!isMobile && <ChatbotNegocios />}
+
+        </div>{/* fin layout */}
+
       </div>
     </>
   );

@@ -891,3 +891,67 @@
   font-style: italic;
   flex-shrink: 0;
 }
+/* ─────────────────────────────────────────────────────────────────────────────
+   PARCHE para MisNegocios.module.css
+   Reemplaza/agrega estas clases en tu archivo existente.
+   El resto del CSS permanece igual.
+─────────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Layout principal — 3 columnas ─────────────────────────────────────────
+   sidebar (320px) | editPanel (flex:1) | chatbot (48px colapsado / 320px abierto)
+─────────────────────────────────────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: calc(100vh - 57px); /* altura del header */
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.layoutMobile {
+  flex-direction: column;
+  height: auto;
+  overflow: visible;
+}
+
+/* ─── Sidebar izquierda (sin cambios de tamaño) ─────────────────────────────── */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(28,66,232,0.35);
+  overflow-y: auto;
+  background: #0a1628;
+}
+
+.sidebarMobile {
+  width: 100%;
+  border-right: none;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  overflow-y: visible;
+}
+
+/* ─── Panel de edición — columna central ────────────────────────────────────── */
+.editPanel {
+  flex: 1;            /* ocupa todo el espacio sobrante entre sidebar y chat */
+  overflow-y: auto;
+  background: #020c1f;
+  min-width: 0;       /* evita overflow en flex */
+}
+
+.editPanelMobile {
+  min-height: auto;
+}
+
+/* ─── Estado vacío cuando no hay negocio seleccionado ───────────────────────── */
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.42);
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
