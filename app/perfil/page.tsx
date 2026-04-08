@@ -48,9 +48,25 @@ export default function Perfil() {
 
           {/* Info */}
           <div style={{ background: "#0f1f1c", border: "1px solid rgba(29,138,140,0.2)", borderRadius: "14px", padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
+            {user.user_metadata?.first_name && (
+              <div>
+                <p style={{ fontSize: "0.75rem", color: "#5a8080", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Nombre</p>
+                <p style={{ fontSize: "0.9rem" }}>{user.user_metadata.first_name} {user.user_metadata?.last_name ?? ""}</p>
+              </div>
+            )}
             <div>
               <p style={{ fontSize: "0.75rem", color: "#5a8080", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Correo</p>
               <p style={{ fontSize: "0.9rem" }}>{user.email}</p>
+            </div>
+            {user.user_metadata?.phone && (
+              <div>
+                <p style={{ fontSize: "0.75rem", color: "#5a8080", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Teléfono</p>
+                <p style={{ fontSize: "0.9rem" }}>{user.user_metadata.phone}</p>
+              </div>
+            )}
+            <div>
+              <p style={{ fontSize: "0.75rem", color: "#5a8080", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Tipo de cuenta</p>
+              <p style={{ fontSize: "0.9rem", textTransform: "capitalize" }}>{user.user_metadata?.user_type ?? "turista"}</p>
             </div>
             <div>
               <p style={{ fontSize: "0.75rem", color: "#5a8080", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Miembro desde</p>
@@ -60,12 +76,14 @@ export default function Perfil() {
 
           {/* Actions */}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <button onClick={() => router.push("/mis-negocios")} style={{
-              width: "100%", padding: "13px", borderRadius: "12px", border: "1px solid rgba(29,138,140,0.3)",
-              background: "rgba(29,138,140,0.08)", color: "#2ab5b8", fontFamily: "inherit", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer",
-            }}>
-              Mis negocios
-            </button>
+            {user.user_metadata?.user_type === "negocio" && (
+              <button onClick={() => router.push("/mis-negocios")} style={{
+                width: "100%", padding: "13px", borderRadius: "12px", border: "1px solid rgba(29,138,140,0.3)",
+                background: "rgba(29,138,140,0.08)", color: "#2ab5b8", fontFamily: "inherit", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer",
+              }}>
+                Mis negocios
+              </button>
+            )}
             <button onClick={async () => { await supabase.auth.signOut(); router.push("/"); }} style={{
               width: "100%", padding: "13px", borderRadius: "12px", border: "1px solid rgba(239,68,68,0.2)",
               background: "rgba(239,68,68,0.06)", color: "#ef4444", fontFamily: "inherit", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer",
