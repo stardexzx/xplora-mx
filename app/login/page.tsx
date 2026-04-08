@@ -12,7 +12,7 @@ function getPasswordStrength(pw: string): 0 | 1 | 2 | 3 | 4 {
   if (!pw) return 0;
   let score = 0;
   if (pw.length >= 8) score++;
-  if (/[A-Z]/.test(pw)) score++; 
+  if (/[A-Z]/.test(pw)) score++;
   if (/[0-9]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   return score as 0 | 1 | 2 | 3 | 4;
@@ -40,6 +40,11 @@ const UserIcon = () => (
     <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
   </svg>
 );
+const PhoneIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.06 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+);
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" width={18} height={18}>
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
@@ -59,21 +64,22 @@ export default function AuthPage() {
   const [userType, setUserType] = useState<UserType>("turista");
 
   // Login
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginEmail, setLoginEmail]       = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  const [showLoginPw, setShowLoginPw] = useState(false);
-  const [loginStatus, setLoginStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [loginError, setLoginError] = useState("");
+  const [showLoginPw, setShowLoginPw]     = useState(false);
+  const [loginStatus, setLoginStatus]     = useState<"idle" | "loading" | "success">("idle");
+  const [loginError, setLoginError]       = useState("");
 
   // Register
   const [regFirstName, setRegFirstName] = useState("");
-  const [regLastName, setRegLastName] = useState("");
-  const [regEmail, setRegEmail] = useState("");
-  const [regPassword, setRegPassword] = useState("");
-  const [showRegPw, setShowRegPw] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [regStatus, setRegStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [regError, setRegError] = useState("");
+  const [regLastName, setRegLastName]   = useState("");
+  const [regEmail, setRegEmail]         = useState("");
+  const [regPhone, setRegPhone]         = useState("");
+  const [regPassword, setRegPassword]   = useState("");
+  const [showRegPw, setShowRegPw]       = useState(false);
+  const [acceptTerms, setAcceptTerms]   = useState(false);
+  const [regStatus, setRegStatus]       = useState<"idle" | "loading" | "success">("idle");
+  const [regError, setRegError]         = useState("");
 
   const [shake, setShake] = useState(false);
   const triggerShake = useCallback(() => {
@@ -81,7 +87,7 @@ export default function AuthPage() {
     setTimeout(() => setShake(false), 450);
   }, []);
 
-  // ── Login con Supabase ──
+  // ── Login ──
   const handleLogin = async () => {
     if (!loginEmail || !loginPassword) { triggerShake(); return; }
     setLoginError(""); setLoginStatus("loading");
@@ -99,39 +105,64 @@ export default function AuthPage() {
     }
   };
 
-  // ── Registro con Supabase ──
+  // ── Registro ──
   const handleRegister = async () => {
     if (!regEmail || !regPassword || !acceptTerms) { triggerShake(); return; }
     if (regPassword.length < 6) {
       setRegError("La contraseña debe tener al menos 6 caracteres.");
       triggerShake(); return;
     }
+    if (regPhone && !/^\+?[\d\s\-()]{10,15}$/.test(regPhone)) {
+      setRegError("Número de teléfono inválido.");
+      triggerShake(); return;
+    }
+
     setRegError(""); setRegStatus("loading");
+
     const { error } = await supabase.auth.signUp({
       email: regEmail,
       password: regPassword,
       options: {
         data: {
           first_name: regFirstName,
-          last_name: regLastName,
-          user_type: userType,
+          last_name:  regLastName,
+          user_type:  userType,
+          phone:      regPhone,
         },
       },
     });
+
     if (error) {
       setRegError(error.message);
       setRegStatus("idle");
       triggerShake();
-    } else {
-      setRegStatus("success");
-      setTimeout(() => router.push("/"), 800);
+      return;
     }
+
+    // ── Guarda datos adicionales en user_metadata de auth.users ──
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: {
+        first_name: regFirstName,
+        last_name:  regLastName,
+        user_type:  userType,
+        phone:      regPhone,
+      },
+    });
+
+    if (updateError) {
+      setRegError(`Error al guardar datos: ${updateError.message}`);
+      setRegStatus("idle");
+      return;
+    }
+
+    setRegStatus("success");
+    setTimeout(() => router.push("/"), 800);
   };
 
   const pwStrength = getPasswordStrength(regPassword);
 
   const loginBtnClass = [styles.btnMain, shake && tab === "login" ? styles.shake : ""].filter(Boolean).join(" ");
-  const regBtnClass = [styles.btnMain, userType === "negocio" ? styles.orange : "", shake && tab === "register" ? styles.shake : ""].filter(Boolean).join(" ");
+  const regBtnClass   = [styles.btnMain, userType === "negocio" ? styles.orange : "", shake && tab === "register" ? styles.shake : ""].filter(Boolean).join(" ");
 
   return (
     <div className={styles.body}>
@@ -162,61 +193,52 @@ export default function AuthPage() {
         </div>
 
         {/* ── LOGIN ── */}
-        {tab === "login" && (
-          <>
-            <div className={styles.typeRow}>
-              <button className={`${styles.typeBtn} ${userType === "turista" ? styles.sel : ""}`} onClick={() => setUserType("turista")}>
-                <span className={styles.ico}>🧳</span> Turista
-              </button>
-              <button className={`${styles.typeBtn} ${userType === "negocio" ? styles.selO : ""}`} onClick={() => setUserType("negocio")}>
-                <span className={styles.ico}>🏪</span> Negocio
-              </button>
-            </div>
+        {/* ── LOGIN ── */}
+{tab === "login" && (
+  <>
+    <div className={styles.formBody}>
+      <div className={styles.field}>
+        <label className={styles.label}>Correo electrónico</label>
+        <div className={styles.inputWrap}>
+          <span className={styles.inputIcon}><MailIcon /></span>
+          <input type="email" className={styles.input} placeholder="correo@ejemplo.com"
+            value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleLogin()}
+            autoComplete="email" />
+        </div>
+      </div>
 
-            <div className={styles.formBody}>
-              <div className={styles.field}>
-                <label className={styles.label}>Correo electrónico</label>
-                <div className={styles.inputWrap}>
-                  <span className={styles.inputIcon}><MailIcon /></span>
-                  <input type="email" className={styles.input} placeholder="correo@ejemplo.com"
-                    value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleLogin()}
-                    autoComplete="email" />
-                </div>
-              </div>
+      <div className={styles.field}>
+        <label className={styles.label}>Contraseña</label>
+        <div className={styles.inputWrap}>
+          <span className={styles.inputIcon}><LockIcon /></span>
+          <input type={showLoginPw ? "text" : "password"} className={styles.input}
+            placeholder="Tu contraseña" value={loginPassword}
+            onChange={e => setLoginPassword(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleLogin()}
+            autoComplete="current-password" />
+          <button type="button" className={styles.eyeBtn} onClick={() => setShowLoginPw(v => !v)}>
+            {showLoginPw ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        </div>
+      </div>
 
-              <div className={styles.field}>
-                <label className={styles.label}>Contraseña</label>
-                <div className={styles.inputWrap}>
-                  <span className={styles.inputIcon}><LockIcon /></span>
-                  <input type={showLoginPw ? "text" : "password"} className={styles.input}
-                    placeholder="Tu contraseña" value={loginPassword}
-                    onChange={e => setLoginPassword(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleLogin()}
-                    autoComplete="current-password" />
-                  <button type="button" className={styles.eyeBtn} onClick={() => setShowLoginPw(v => !v)}>
-                    {showLoginPw ? <EyeOffIcon /> : <EyeIcon />}
-                  </button>
-                </div>
-              </div>
+      {loginError && (
+        <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:"8px", padding:"8px 12px", color:"#C13515", fontSize:"0.82rem" }}>
+          {loginError}
+        </div>
+      )}
 
-              {loginError && (
-                <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "8px", padding: "8px 12px", color: "#C13515", fontSize: "0.82rem" }}>
-                  {loginError}
-                </div>
-              )}
+      <button className={loginBtnClass} onClick={handleLogin} disabled={loginStatus !== "idle"}>
+        {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Entrar a Xplora MX"}
+      </button>
+    </div>
 
-              <button className={loginBtnClass} onClick={handleLogin} disabled={loginStatus !== "idle"}>
-                {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Entrar a Xplora MX"}
-              </button>
-            </div>
-
-            <div className={styles.cardFooter}>
-              ¿Sin cuenta? <a onClick={() => setTab("register")} style={{ cursor: "pointer" }}>Regístrate gratis</a>
-            </div>
-          </>
-        )}
-
+    <div className={styles.cardFooter}>
+      ¿Sin cuenta? <a onClick={() => setTab("register")} style={{ cursor:"pointer" }}>Regístrate gratis</a>
+    </div>
+  </>
+)}
         {/* ── REGISTER ── */}
         {tab === "register" && (
           <>
@@ -260,6 +282,18 @@ export default function AuthPage() {
                 </div>
               </div>
 
+              {/* ── TELÉFONO ── */}
+              <div className={styles.field}>
+                <label className={styles.label}>Teléfono celular</label>
+                <div className={styles.inputWrap}>
+                  <span className={styles.inputIcon}><PhoneIcon /></span>
+                  <input type="tel" className={styles.input} placeholder="+52 55 1234 5678"
+                    value={regPhone} onChange={e => setRegPhone(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleRegister()}
+                    autoComplete="tel" />
+                </div>
+              </div>
+
               <div className={styles.field}>
                 <label className={styles.label}>Contraseña</label>
                 <div className={styles.inputWrap}>
@@ -287,7 +321,7 @@ export default function AuthPage() {
               </div>
 
               {regError && (
-                <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "8px", padding: "8px 12px", color: "#C13515", fontSize: "0.82rem" }}>
+                <div style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:"8px", padding:"8px 12px", color:"#C13515", fontSize:"0.82rem" }}>
                   {regError}
                 </div>
               )}
@@ -298,7 +332,7 @@ export default function AuthPage() {
             </div>
 
             <div className={styles.cardFooter}>
-              ¿Ya tienes cuenta? <a onClick={() => setTab("login")} style={{ cursor: "pointer" }}>Inicia sesión</a>
+              ¿Ya tienes cuenta? <a onClick={() => setTab("login")} style={{ cursor:"pointer" }}>Inicia sesión</a>
             </div>
           </>
         )}

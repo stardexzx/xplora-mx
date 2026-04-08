@@ -105,27 +105,25 @@
 }
 
 .logoImg {
-  /* ↓ Larger logo (was 100px) */
-  width: 10000px;
-  height: 10000px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   border-radius: 50%;
   background: var(--cream);
   padding: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,.2);
   animation: spin-in .6s .1s cubic-bezier(.22,.68,0,1.2) both;
-  
 }
 
 .logoFallback {
   display: none;
-  /* ↓ Match new logo size */
-  width: 120px; height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--cream);
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 2rem;
   box-shadow: 0 4px 20px rgba(0,0,0,.2);
 }
 
@@ -538,7 +536,7 @@
 
   .hero {
     /* ↓ Compact on mobile too */
-    padding: 1rem 1.25rem .85rem;
+  padding: .9rem 2rem .8rem;
   }
 
   .logoImg,
@@ -549,12 +547,18 @@
   }
 
   .brandName {
-    font-size: 1.4rem;
-  }
+  font-size: 1.5rem;
+  margin-top: .1rem;
+}
 
-  .brandSub {
-    font-size: .7rem;
-  }
+.brandSub {
+  font-size: .7rem;
+  margin-top: 1px;
+}
+
+.logoWrap {
+  margin-bottom: .35rem;
+}
 
   .tabs {
     padding: 1rem 1.25rem .2rem;
@@ -600,20 +604,23 @@
   }
 }
 
-/* ─── Tablet (481px – 767px) ─────────────────────────────────────────────── */
-@media (min-width: 481px) and (max-width: 767px) {
-  .body {
-    padding: 1.5rem 1rem;
-    align-items: center;
+@media (max-width: 480px) {
+  .logoImg,
+  .logoFallback {
+    width: 64px;
+    height: 64px;
   }
+}
 
-  .card {
-    max-width: 400px;
-    border-radius: 24px;
+@media (min-width: 768px) {
+  .logoImg,
+  .logoFallback {
+    width: 88px;
+    height: 88px;
   }
 
   .hero {
-    padding: 1.2rem 1.75rem 1rem;
+    padding: 1rem 2.5rem .9rem;
   }
 }
 
