@@ -1,11 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Playfair_Display,
+  Poppins,
+  Courier_Prime,
+} from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "../context/LangContext";
 import { MapsProvider } from "../context/MapsContext";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+const playfairDisplay = Playfair_Display({
+  variable: "--font-display",
+  subsets: ["latin"],
+});
+const poppins = Poppins({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  subsets: ["latin"],
+});
+const courierPrime = Courier_Prime({
+  weight: ["400", "700"],
+  variable: "--font-mono",
+  subsets: ["latin"],
+});
 
 export const viewport: Viewport = {
   themeColor: "#10b981",
@@ -29,11 +52,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${poppins.variable} ${courierPrime.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
-        <LangProvider><MapsProvider>{children}</MapsProvider></LangProvider>
+        <LangProvider>
+          <MapsProvider>{children}</MapsProvider>
+        </LangProvider>
       </body>
     </html>
   );
