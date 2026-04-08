@@ -1,6 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import ChatbotWidget from "../component/ChatbotWidget";
+import { useEffect, useState, useCallback } from "react";
 import BusinessMap from "../component/Map";
 import BusinessPopup from "../component/BusinessPopup";
 import { CATEGORIES, CATEGORY_LABELS_ES } from "../component/CategoryFilter";
@@ -34,15 +34,37 @@ const CAT_EMOJI: Record<string, string> = {
   entretenimiento: "🎭",
 };
 
+// ── Calcula promedios desde reviews ─────────────────────────────────────────
+async function fetchRatings(): Promise<Record<string, number>> {
+  const { data } = await supabase
+    .from("reviews")
+    .select("negocio_id, rating");
+
+  if (!data) return {};
+
+  // Agrupa por negocio_id y calcula promedio
+  const map: Record<string, { sum: number; count: number }> = {};
+  for (const r of data) {
+    if (!map[r.negocio_id]) map[r.negocio_id] = { sum: 0, count: 0 };
+    map[r.negocio_id].sum += r.rating;
+    map[r.negocio_id].count += 1;
+  }
+
+  const result: Record<string, number> = {};
+  for (const [id, { sum, count }] of Object.entries(map)) {
+    result[id] = Math.round((sum / count) * 10) / 10; // 1 decimal
+  }
+  return result;
+}
+
 // ── Star rating display ──────────────────────────────────────────────────────
 function StarRating({ value }: { value: number }) {
-  const rounded = Math.round(value * 2) / 2; // mitad de estrella
   return (
     <span style={{ display: "inline-flex", gap: "1px", alignItems: "center" }}>
       {[1, 2, 3, 4, 5].map(s => (
         <svg key={s} width="11" height="11" viewBox="0 0 24 24"
-          fill={s <= rounded ? "#F0D224" : "rgba(255,255,255,0.15)"}
-          stroke={s <= rounded ? "#F0D224" : "rgba(255,255,255,0.2)"}
+          fill={s <= Math.round(value) ? "#F0D224" : "rgba(255,255,255,0.15)"}
+          stroke={s <= Math.round(value) ? "#F0D224" : "rgba(255,255,255,0.2)"}
           strokeWidth="1">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
         </svg>
@@ -57,6 +79,7 @@ export default function Home() {
   const [negocios, setNegocios] = useState<Negocio[]>([]);
   const negociosToShow = useTranslatedNegocios(negocios, lang);
   const [todosLosNegocios, setTodos] = useState<Negocio[]>([]);
+  const [ratings, setRatings] = useState<Record<string, number>>({});
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
@@ -94,23 +117,33 @@ export default function Home() {
     });
   }, []);
 
+  // Carga negocios y ratings en paralelo
   useEffect(() => {
-    supabase
-      .from("negocios")
-      .select("*, negocio_images(url, order_index)")
-      .eq("status", "approved")
-      .then(({ data, error }) => {
-        if (!error && data) {
-          const enriched = data.map((n: any) => ({
-            ...n,
-            images: (n.negocio_images ?? [])
-              .sort((a: any, b: any) => a.order_index - b.order_index)
-              .map((i: any) => i.url),
-          })) as Negocio[];
-          setTodos(enriched);
-          setNegocios(enriched);
-        }
-      });
+    Promise.all([
+      supabase
+        .from("negocios")
+        .select("*, negocio_images(url, order_index)")
+        .eq("status", "approved"),
+      fetchRatings(),
+    ]).then(([{ data, error }, ratingMap]) => {
+      if (!error && data) {
+        const enriched = data.map((n: any) => ({
+          ...n,
+          images: (n.negocio_images ?? [])
+            .sort((a: any, b: any) => a.order_index - b.order_index)
+            .map((i: any) => i.url),
+        })) as Negocio[];
+        setTodos(enriched);
+        setNegocios(enriched);
+      }
+      setRatings(ratingMap);
+    });
+  }, []);
+
+  // Recarga ratings después de una nueva reseña
+  const refreshRatings = useCallback(async () => {
+    const ratingMap = await fetchRatings();
+    setRatings(ratingMap);
   }, []);
 
   useEffect(() => {
@@ -225,7 +258,6 @@ export default function Home() {
 
   const fmtDist = (km?: number) => !km ? null : km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
 
-  // ── Loading ──
   if (!ready)
     return (
       <div className="cp-loading">
@@ -261,7 +293,6 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Nearby */}
             <button className={`cp-ibtn${nearbyOnly ? " on" : ""}`} onClick={nearbyOnly ? handleShowAll : handleGetLocation} title="Cerca de mí">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
@@ -269,7 +300,6 @@ export default function Home() {
               </svg>
             </button>
 
-            {/* Language */}
             <div style={{ position:"relative" }}>
               <button className="cp-ibtn" onClick={() => { setShowLangMenu(!showLangMenu); setShowUserMenu(false); }}>
                 {LANGUAGES.find((l) => l.code === lang)?.flag ?? "ES"}
@@ -287,7 +317,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* User */}
             {user ? (
               <div style={{ position:"relative" }}>
                 <button className="cp-ibtn" onClick={() => { setShowUserMenu(!showUserMenu); setShowLangMenu(false); }}>
@@ -322,7 +351,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Search row */}
           <div style={{ display:"flex", gap:"8px", alignItems:"center" }}>
             <div style={{ position:"relative", flex:1 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"
@@ -412,6 +440,8 @@ export default function Home() {
                 negociosToShow.map((n) => {
                   const emoji = CAT_EMOJI[n.category?.toLowerCase().split(" ")[0]] ?? "🏪";
                   const dist = fmtDist(n.distancia_km);
+                  // Promedio calculado desde reviews en memoria
+                  const avgRating = ratings[n.id];
                   return (
                     <div key={n.id} className={`cp-card${selectedNegocio?.id === n.id ? " sel" : ""}`}
                       onClick={() => { setSelected(n); if (isMobile) setMobileView("map"); }}>
@@ -421,26 +451,22 @@ export default function Home() {
                       <div style={{ flex:1, minWidth:0 }}>
                         <p className="cp-card__name">{n.name}</p>
                         <p className="cp-card__desc">{n.description?.split(".")[0] ?? n.category}</p>
-                        {/* ── Estrellas de calificación ── */}
-                        {n.rating != null && n.rating > 0 ? (
-                          <div style={{ display:"flex", alignItems:"center", gap:"5px", marginTop:"4px" }}>
-                            <StarRating value={n.rating} />
+                        {/* ── Estrellas calculadas desde reseñas ── */}
+                        <div style={{ display:"flex", alignItems:"center", gap:"5px", marginTop:"4px" }}>
+                          <StarRating value={avgRating ?? 0} />
+                          {avgRating != null ? (
                             <span style={{ fontSize:"0.75rem", fontWeight:700, color:"#F0D224" }}>
-                              {n.rating.toFixed(1)}
+                              {avgRating.toFixed(1)}
                             </span>
-                          </div>
-                        ) : (
-                          <div style={{ display:"flex", alignItems:"center", gap:"5px", marginTop:"4px" }}>
-                            <StarRating value={0} />
+                          ) : (
                             <span style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)", fontWeight:500 }}>
-                              Sin calificar
+                              Sin reseñas
                             </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                      {/* Distancia */}
                       {dist && (
-                        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", flexShrink:0 }}>
+                        <div style={{ flexShrink:0 }}>
                           <span style={{ fontSize:"0.75rem", color:"var(--muted)", fontWeight:500 }}>{dist}</span>
                         </div>
                       )}
@@ -467,6 +493,7 @@ export default function Home() {
                   userLocation={userLocation}
                   onRouteRequest={setRouteRequest}
                   routeResult={routeResult}
+                  onReviewSubmitted={refreshRatings}
                 />
               )}
               <button className="cp-qr" onClick={() => (window.location.href = "/qr")}>
@@ -519,6 +546,7 @@ export default function Home() {
             ))}
           </nav>
         )}
+        <ChatbotWidget />   {/* ← aquí */}
       </div>
     </>
   );
