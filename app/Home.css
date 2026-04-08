@@ -1,0 +1,500 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   home.css  —  Estilos del mapa/home de XploraMX con paleta Coppel
+   Importar en el layout o en el componente:
+     import "./home.css";
+   Todos los selectores usan el prefijo .cp para no colisionar con globals.css
+──────────────────────────────────────────────────────────────────────────────── */
+
+/* ── Loading screen ─────────────────────────────────────────────────────────── */
+.cp-loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--dark-blue);
+}
+
+.cp-loading__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cp-loading__title {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--white);
+  font-family: var(--font-body);
+}
+
+.cp-loading__sub {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+}
+
+/* ── Root wrapper ───────────────────────────────────────────────────────────── */
+.cp {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.cp ::-webkit-scrollbar { width: 4px; height: 4px; }
+.cp ::-webkit-scrollbar-track { background: transparent; }
+.cp ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+.cp-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-solid);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+@media (min-width: 768px) {
+  .cp-header { padding: 12px 20px; }
+}
+
+.cp-header__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Logo ───────────────────────────────────────────────────────────────────── */
+.cp-logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cp-logo-text {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  font-family: var(--font-body);
+}
+
+.cp-logo-badge {
+  background: var(--yellow);
+  color: var(--dark-blue);
+  padding: 1px 7px 2px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-left: 5px;
+}
+
+/* ── Search input ───────────────────────────────────────────────────────────── */
+.cp-search {
+  width: 100%;
+  height: 42px;
+  padding: 0 16px 0 42px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid var(--border);
+  border-radius: 21px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.cp-search:focus {
+  border-color: var(--blue);
+  background: rgba(28, 66, 232, 0.08);
+}
+
+.cp-search::placeholder { color: var(--muted); }
+
+/* ── Icon button ────────────────────────────────────────────────────────────── */
+.cp-ibtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.cp-ibtn:hover {
+  background: rgba(28, 66, 232, 0.15);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+.cp-ibtn.on {
+  background: rgba(28, 66, 232, 0.2);
+  border-color: var(--blue);
+  color: var(--light-blue);
+}
+
+/* ── Voice button ───────────────────────────────────────────────────────────── */
+.cp-voice {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.cp-voice:hover {
+  border-color: var(--blue);
+  color: var(--light-blue);
+}
+
+.cp-voice.on {
+  border-color: var(--danger);
+  background: rgba(255, 89, 77, 0.12);
+  color: var(--danger);
+  animation: cpPulse 1s infinite;
+}
+
+@keyframes cpPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 89, 77, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(255, 89, 77, 0); }
+}
+
+/* ── Dropdown ───────────────────────────────────────────────────────────────── */
+.cp-drop {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  z-index: 2000;
+  background: var(--surface2);
+  border: 1px solid var(--border-solid);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 10px 40px rgba(8, 23, 84, 0.7);
+  min-width: 170px;
+  animation: cpFade 0.15s ease both;
+}
+
+@keyframes cpFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.cp-dbtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.cp-dbtn:hover { background: var(--surface3); }
+.cp-dbtn.danger { color: var(--danger); }
+.cp-dbtn.center { text-align: center; font-weight: 700; }
+
+/* ── Category bar ───────────────────────────────────────────────────────────── */
+.cp-catbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-solid);
+  background: var(--bg);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.cp-catbar::-webkit-scrollbar { display: none; }
+
+/* ── Category pill ──────────────────────────────────────────────────────────── */
+.cp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1.5px solid var(--border-solid);
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+
+.cp-pill:hover {
+  border-color: var(--blue);
+  color: var(--white);
+  background: rgba(28, 66, 232, 0.12);
+}
+
+.cp-pill.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+  box-shadow: var(--shadow-blue);
+}
+
+/* ── Mobile tabs ────────────────────────────────────────────────────────────── */
+.cp-tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-solid);
+  flex-shrink: 0;
+}
+
+.cp-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+
+.cp-tab.active {
+  font-weight: 700;
+  color: var(--light-blue);
+  border-bottom-color: var(--blue);
+}
+
+/* ── List panel ─────────────────────────────────────────────────────────────── */
+.cp-list {
+  width: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  flex-direction: column;
+  padding-top: 10px;
+  padding-bottom: 70px;
+}
+
+@media (min-width: 768px) {
+  .cp-list {
+    width: 380px;
+    border-right: 1px solid var(--border-solid);
+    padding-bottom: 10px;
+  }
+}
+
+/* ── Nearby banner ──────────────────────────────────────────────────────────── */
+.cp-nearby-banner {
+  margin: 0 12px 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(28, 66, 232, 0.1);
+  border: 1px solid var(--border-solid);
+  font-size: 0.78rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+/* ── Empty state ────────────────────────────────────────────────────────────── */
+.cp-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+
+/* ── Business card ──────────────────────────────────────────────────────────── */
+.cp-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  margin: 0 12px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border-solid);
+  transition: all 0.15s;
+}
+
+.cp-card:hover {
+  background: var(--surface2);
+  border-color: var(--blue);
+}
+
+.cp-card.sel {
+  background: rgba(28, 66, 232, 0.12);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+
+.cp-card__name {
+  margin: 0 0 2px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cp-card__desc {
+  margin: 0 0 7px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Thumbnail ──────────────────────────────────────────────────────────────── */
+.cp-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border-solid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  overflow: hidden;
+}
+
+.cp-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── FAB & QR ───────────────────────────────────────────────────────────────── */
+.cp-fab {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  padding: 11px 20px;
+  border-radius: 24px;
+  border: none;
+  /* Amarillo Coppel — CTA de alta visibilidad */
+  background: var(--yellow);
+  color: var(--dark-blue);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-yellow);
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.cp-fab:hover {
+  background: var(--accent-dk);
+  transform: translateY(-2px);
+}
+
+.cp-qr {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: var(--blue);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-blue);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cp-qr:hover {
+  background: #2954ff;
+  transform: translateY(-1px);
+}
+
+/* ── Bottom nav ─────────────────────────────────────────────────────────────── */
+.cp-nav {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border-top: 1px solid var(--border-solid);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 60px;
+}
+
+.cp-nbtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.cp-nbtn.active { color: var(--light-blue); }
