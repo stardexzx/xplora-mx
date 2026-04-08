@@ -120,6 +120,8 @@ export default function Home() {
   const [activeNav, setActiveNav] = useState<
     "mapa" | "asistente" | "negocio" | "perfil"
   >("mapa");
+  const [routeRequest, setRouteRequest] = useState<import("../component/Map").RouteRequest | null>(null);
+  const [routeResult, setRouteResult] = useState<import("../app/api/route/route").RouteResult | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -1117,12 +1119,17 @@ export default function Home() {
                 negocios={negociosToShow} // ← antes era negocios
                 selectedId={selectedNegocio?.id ?? null}
                 userLocation={userLocation}
-                onSelectNegocio={(n) => setSelected(n)}
+                onSelectNegocio={(n) => { setSelected(n); setRouteRequest(null); setRouteResult(null); }}
+                routeRequest={routeRequest}
+                onRouteResult={setRouteResult}
               />
               {selectedNegocio && (
                 <BusinessPopup
                   negocio={selectedNegocio}
-                  onClose={() => setSelected(null)}
+                  onClose={() => { setSelected(null); setRouteRequest(null); setRouteResult(null); }}
+                  userLocation={userLocation}
+                  onRouteRequest={setRouteRequest}
+                  routeResult={routeResult}
                 />
               )}
               <button

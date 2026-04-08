@@ -4,10 +4,16 @@ import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
 import { Negocio } from "../types/negocio";
 import { useLang } from "../context/LangContext";
+import { LatLng } from "../services/geo";
+import { TravelMode, RouteRequest } from "./Map";
+import type { RouteResult } from "../app/api/route/route";
 
 interface Props {
   negocio: Negocio;
   onClose: () => void;
+  userLocation?: LatLng | null;
+  onRouteRequest?: (req: RouteRequest | null) => void;
+  routeResult?: RouteResult | null;
 }
 
 interface Review {
@@ -40,12 +46,14 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
 }
 
-type Tab = "info" | "reviews";
+type Tab = "info" | "reviews" | "ruta";
 
-export default function BusinessPopup({ negocio, onClose }: Props) {
+export default function BusinessPopup({ negocio, onClose, userLocation, onRouteRequest, routeResult }: Props) {
   const { t } = useLang();
   const [imgIndex, setImgIndex] = useState(0);
   const [tab, setTab] = useState<Tab>("info");
+  const [travelMode, setTravelMode] = useState<TravelMode>("TRANSIT");
+  const [routeRequested, setRouteRequested] = useState(false);
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
@@ -87,7 +95,23 @@ export default function BusinessPopup({ negocio, onClose }: Props) {
 
   useEffect(() => {
     if (tab === "reviews") loadReviews();
+    if (tab !== "ruta") {
+      onRouteRequest?.(null);
+      setRouteRequested(false);
+    }
   }, [tab, negocio.id]);
+
+  const requestRoute = (mode: TravelMode) => {
+    setTravelMode(mode);
+    setRouteRequested(true);
+    if (userLocation) {
+      onRouteRequest?.({
+        origin: userLocation,
+        destination: { lat: negocio.lat, lng: negocio.lng },
+        mode,
+      });
+    }
+  };
 
   const submitReview = async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -214,6 +238,7 @@ export default function BusinessPopup({ negocio, onClose }: Props) {
         <button style={tabStyle(tab === "reviews")} onClick={() => setTab("reviews")}>
           Reseñas{tab === "reviews" && reviews.length > 0 ? ` (${reviews.length})` : ""}
         </button>
+        <button style={tabStyle(tab === "ruta")} onClick={() => setTab("ruta")}>🗺 Ruta</button>
       </div>
 
       {/* ── Contenido scrollable ── */}
@@ -366,6 +391,126 @@ export default function BusinessPopup({ negocio, onClose }: Props) {
             ))}
           </div>
         )}
+        {/* TAB RUTA */}
+        {tab === "ruta" && (() => {
+          const modeConfig: { mode: TravelMode; label: string; icon: React.ReactNode; color: string }[] = [
+            {
+              mode: "TRANSIT", label: "Transporte", color: "#1a73e8",
+              icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 19h8M12 16v3"/><path d="M8 9h8M8 12h4"/></svg>,
+            },
+            {
+              mode: "WALKING", label: "A pie", color: "#34a853",
+              icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="4" r="1.5"/><path d="M8 17l1-5 3 2 2-5M8 12l-2 5M16 12l2 5"/></svg>,
+            },
+            {
+              mode: "DRIVING", label: "En auto", color: "#ea4335",
+              icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h16a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="2" rx="1"/><path d="M5 11h14M7 7l2-4h6l2 4"/></svg>,
+            },
+          ];
+
+          const fmtDuration = (secs: number) => {
+            if (secs < 60) return `${secs} seg`;
+            const m = Math.round(secs / 60);
+            return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${m % 60}min`;
+          };
+          const fmtDist = (meters: number) =>
+            meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${meters} m`;
+          const stepDuration = (dur: string) => {
+            const s = parseInt(dur.replace("s", ""), 10);
+            return isNaN(s) ? dur : fmtDuration(s);
+          };
+
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* Selector de modo */}
+              <div style={{ display: "flex", gap: "8px" }}>
+                {modeConfig.map(({ mode, label, icon, color }) => (
+                  <button key={mode} onClick={() => requestRoute(mode)} style={{
+                    flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+                    gap: "4px", padding: "10px 4px", borderRadius: "var(--radius)",
+                    border: `2px solid ${travelMode === mode && routeRequested ? color : "var(--border)"}`,
+                    background: travelMode === mode && routeRequested ? `${color}14` : "var(--surface)",
+                    color: travelMode === mode && routeRequested ? color : "var(--text2)",
+                    cursor: "pointer", transition: "all 0.15s", fontSize: "0.7rem", fontWeight: 600,
+                  }}>
+                    {icon}{label}
+                  </button>
+                ))}
+              </div>
+
+              {!userLocation && (
+                <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: "var(--radius-sm)", padding: "10px 12px", fontSize: "0.82rem", color: "#c2410c", display: "flex", gap: "8px", alignItems: "center" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Activa tu ubicación para ver rutas
+                </div>
+              )}
+
+              {userLocation && !routeRequested && (
+                <div style={{ textAlign: "center", padding: "20px 0", color: "var(--text2)", fontSize: "0.85rem" }}>
+                  Selecciona un modo de transporte
+                </div>
+              )}
+
+              {userLocation && routeRequested && !routeResult && (
+                <div style={{ textAlign: "center", padding: "20px 0", color: "var(--text2)", fontSize: "0.85rem" }}>
+                  <div style={{ width: "20px", height: "20px", border: "2px solid var(--border)", borderTopColor: "var(--text)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 8px" }} />
+                  Calculando ruta...
+                </div>
+              )}
+
+              {routeResult && (
+                <>
+                  <div style={{ background: "var(--surface)", borderRadius: "var(--radius)", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <p style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>{fmtDuration(routeResult.durationSeconds)}</p>
+                      <p style={{ fontSize: "0.8rem", color: "var(--text2)", margin: "2px 0 0" }}>{fmtDist(routeResult.distanceMeters)}</p>
+                    </div>
+                    <a href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation!.lat},${userLocation!.lng}&destination=${negocio.lat},${negocio.lng}&travelmode=${travelMode.toLowerCase()}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ display: "flex", alignItems: "center", gap: "6px", background: "#1a73e8", color: "white", borderRadius: "var(--radius-sm)", padding: "8px 12px", fontSize: "0.78rem", fontWeight: 600, textDecoration: "none" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+                      Google Maps
+                    </a>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <p style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text2)", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Indicaciones</p>
+                    {routeResult.steps.map((step, i) => {
+                      const modeColors: Record<string, string> = { WALKING: "#34a853", TRANSIT: "#1a73e8", DRIVING: "#ea4335", WALK: "#34a853", DRIVE: "#ea4335" };
+                      const accentColor = modeColors[step.travelMode] ?? "#888";
+                      const linea = step.transitDetails?.transitLine;
+                      return (
+                        <div key={i} style={{ display: "flex", gap: "10px", paddingBottom: "12px", position: "relative" }}>
+                          {i < routeResult.steps.length - 1 && (
+                            <div style={{ position: "absolute", left: "11px", top: "22px", bottom: 0, width: "2px", background: "var(--border)" }} />
+                          )}
+                          <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: accentColor, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
+                            <span style={{ color: "white", fontSize: "0.65rem", fontWeight: 700 }}>{i + 1}</span>
+                          </div>
+                          <div style={{ paddingTop: "2px", flex: 1 }}>
+                            <p style={{ fontSize: "0.82rem", color: "var(--text)", margin: 0, lineHeight: 1.45 }}>
+                              {step.instruction || (linea ? `Tomar ${linea.name ?? linea.nameShort}` : "Continuar")}
+                            </p>
+                            {linea && (
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginTop: "4px", background: linea.color ? linea.color + "22" : "var(--surface)", border: `1px solid ${linea.color ?? "var(--border)"}`, borderRadius: "20px", padding: "2px 8px" }}>
+                                <span style={{ fontSize: "0.7rem", fontWeight: 700, color: linea.color ?? "var(--text)" }}>{linea.nameShort ?? linea.name}</span>
+                                {linea.vehicle?.type && <span style={{ fontSize: "0.68rem", color: "var(--text2)" }}>· {linea.vehicle.type}</span>}
+                              </div>
+                            )}
+                            {step.transitDetails?.headsign && (
+                              <p style={{ fontSize: "0.72rem", color: "var(--text2)", margin: "2px 0 0" }}>Dirección: {step.transitDetails.headsign}</p>
+                            )}
+                            <p style={{ fontSize: "0.72rem", color: "var(--muted)", margin: "2px 0 0" }}>{stepDuration(step.duration)} · {fmtDist(step.distanceMeters)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
     </>
