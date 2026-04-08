@@ -13,7 +13,7 @@
   justify-content: center;
   flex-direction: column;
   gap: 12px;
-  background: var(--dark-blue);
+  background: #03112a;
 }
 
 .cp-loading__icon {
@@ -42,18 +42,18 @@
 /* ── Root wrapper ───────────────────────────────────────────────────────────── */
 .cp {
   font-family: var(--font-body);
-  background: var(--bg);
+  background: #03112a;
   color: var(--text);
 }
 
 .cp ::-webkit-scrollbar { width: 4px; height: 4px; }
 .cp ::-webkit-scrollbar-track { background: transparent; }
-.cp ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+.cp ::-webkit-scrollbar-thumb { background: #0a2250; border-radius: 99px; }
 
 /* ── Header ─────────────────────────────────────────────────────────────────── */
 .cp-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-solid);
+  background: #020e22;
+  border-bottom: 1px solid rgba(28, 66, 232, 0.25);
   padding: 10px 14px;
   display: flex;
   flex-direction: column;
@@ -107,8 +107,8 @@
   width: 100%;
   height: 42px;
   padding: 0 16px 0 42px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 21px;
   color: var(--text);
   font-family: var(--font-body);
@@ -131,8 +131,8 @@
   height: 36px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text2);
   cursor: pointer;
   display: flex;
@@ -162,8 +162,8 @@
   height: 42px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text2);
   cursor: pointer;
   display: flex;
@@ -195,11 +195,11 @@
   top: 110%;
   right: 0;
   z-index: 2000;
-  background: var(--surface2);
-  border: 1px solid var(--border-solid);
+  background: #04193d;
+  border: 1px solid rgba(28, 66, 232, 0.25);
   border-radius: 14px;
   padding: 6px;
-  box-shadow: 0 10px 40px rgba(8, 23, 84, 0.7);
+  box-shadow: 0 10px 40px rgba(2, 8, 20, 0.8);
   min-width: 170px;
   animation: cpFade 0.15s ease both;
 }
@@ -225,7 +225,7 @@
   transition: background 0.15s;
 }
 
-.cp-dbtn:hover { background: var(--surface3); }
+.cp-dbtn:hover { background: #061f4a; }
 .cp-dbtn.danger { color: var(--danger); }
 .cp-dbtn.center { text-align: center; font-weight: 700; }
 
@@ -234,8 +234,8 @@
   display: flex;
   gap: 8px;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--border-solid);
-  background: var(--bg);
+  border-bottom: 1px solid rgba(28, 66, 232, 0.25);
+  background: #03112a;
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
@@ -251,8 +251,8 @@
   padding: 7px 16px;
   border-radius: 20px;
   white-space: nowrap;
-  border: 1.5px solid var(--border-solid);
-  background: var(--surface2);
+  border: 1.5px solid rgba(28, 66, 232, 0.25);
+  background: #04193d;
   color: var(--text2);
   font-family: var(--font-body);
   font-weight: 600;
@@ -272,14 +272,14 @@
   background: var(--blue);
   border-color: var(--blue);
   color: var(--white);
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 20px rgba(28, 66, 232, 0.35);
 }
 
 /* ── Mobile tabs ────────────────────────────────────────────────────────────── */
 .cp-tabs {
   display: flex;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-solid);
+  background: #020e22;
+  border-bottom: 1px solid rgba(28, 66, 232, 0.25);
   flex-shrink: 0;
 }
 
@@ -312,7 +312,7 @@
   width: 100%;
   flex-shrink: 0;
   overflow-y: auto;
-  background: var(--bg);
+  background: #03112a;
   flex-direction: column;
   padding-top: 10px;
   padding-bottom: 70px;
@@ -321,7 +321,7 @@
 @media (min-width: 768px) {
   .cp-list {
     width: 380px;
-    border-right: 1px solid var(--border-solid);
+    border-right: 1px solid rgba(28, 66, 232, 0.25);
     padding-bottom: 10px;
   }
 }
@@ -332,7 +332,7 @@
   padding: 8px 14px;
   border-radius: 10px;
   background: rgba(28, 66, 232, 0.1);
-  border: 1px solid var(--border-solid);
+  border: 1px solid rgba(28, 66, 232, 0.25);
   font-size: 0.78rem;
   color: var(--text2);
   font-weight: 500;
@@ -359,18 +359,18 @@
   margin: 0 12px 10px;
   border-radius: 14px;
   cursor: pointer;
-  background: var(--surface);
-  border: 1px solid var(--border-solid);
+  background: #04193d;
+  border: 1px solid rgba(28, 66, 232, 0.25);
   transition: all 0.15s;
 }
 
 .cp-card:hover {
-  background: var(--surface2);
+  background: #061f4a;
   border-color: var(--blue);
 }
 
 .cp-card.sel {
-  background: rgba(28, 66, 232, 0.12);
+  background: rgba(28, 66, 232, 0.15);
   border-color: var(--blue);
   box-shadow: 0 0 0 1px var(--blue);
 }
@@ -400,8 +400,8 @@
   height: 52px;
   border-radius: 10px;
   flex-shrink: 0;
-  background: var(--surface2);
-  border: 1px solid var(--border-solid);
+  background: #061f4a;
+  border: 1px solid rgba(28, 66, 232, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -423,20 +423,19 @@
   padding: 11px 20px;
   border-radius: 24px;
   border: none;
-  /* Amarillo Coppel — CTA de alta visibilidad */
   background: var(--yellow);
   color: var(--dark-blue);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.875rem;
   cursor: pointer;
-  box-shadow: var(--shadow-yellow);
+  box-shadow: 0 4px 16px rgba(240, 210, 36, 0.4);
   z-index: 10;
   transition: all 0.2s;
 }
 
 .cp-fab:hover {
-  background: var(--accent-dk);
+  background: #c8aa00;
   transform: translateY(-2px);
 }
 
@@ -453,7 +452,7 @@
   font-weight: 700;
   font-size: 0.82rem;
   cursor: pointer;
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 20px rgba(28, 66, 232, 0.35);
   z-index: 10;
   display: flex;
   align-items: center;
@@ -470,8 +469,8 @@
 .cp-nav {
   display: flex;
   align-items: stretch;
-  background: var(--surface);
-  border-top: 1px solid var(--border-solid);
+  background: #020e22;
+  border-top: 1px solid rgba(28, 66, 232, 0.25);
   position: fixed;
   bottom: 0;
   left: 0;
