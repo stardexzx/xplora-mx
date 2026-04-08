@@ -48,6 +48,19 @@ export default function Dashboard() {
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string[]>([]);
+  const [diagnostico, setDiagnostico] = useState<null | {
+    score: number;
+    score_label: string;
+    modulos_recomendados: {
+      nombre: string;
+      razon: string;
+      prioridad: number;
+    }[];
+    gaps: string[];
+    turistas_objetivo: string[];
+    tip_rapido: string;
+  }>(null);
+  const [generandoDiagnostico, setGenerandoDiagnostico] = useState(false);
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
   const [openingHours, setOpeningHours] = useState<{
@@ -171,6 +184,77 @@ export default function Dashboard() {
       .join(", ");
   };
 
+  const COPPEL_MODULES = [
+    "Activa tu negocio",
+    "Vende más",
+    "Finanzas para tu negocio",
+    "Impulsa tu negocio",
+    "Formalízate",
+    "Digitalízate",
+    "Profesionalízate",
+    "Empresas familiares",
+    "Educación financiera",
+    "Desarrollate como líder",
+    "Lecciones en un minuto",
+    "Inteligencia Artificial",
+  ];
+
+  const generarDiagnostico = async (negocio: {
+    id: string;
+    name: string;
+    category: string;
+    description: string;
+    tags: string | null;
+    phone: string | null;
+    website: string | null;
+    opening_hours: string | null;
+  }) => {
+    const diasAbiertos = Object.values(openingHours).filter(
+      (d) => d.abierto,
+    ).length;
+
+    const prompt = `Eres experto en microempresas turísticas para el Mundial FIFA 2026 en México.
+
+Negocio registrado en XploraMX:
+- Nombre: ${negocio.name}
+- Categoría: ${negocio.category}
+- Descripción: "${negocio.description || "sin descripción"}"
+- Etiquetas: ${negocio.tags || "ninguna"}
+- Fotos subidas: ${imageFiles.length}
+- Teléfono: ${negocio.phone ? "sí" : "no"}
+- Sitio web: ${negocio.website ? "sí" : "no"}
+- Días abierto por semana: ${diasAbiertos}
+- Tiene ubicación en mapa: sí
+- Descripción traducida al inglés/portugués: sí (automático por DeepL)
+
+Módulos disponibles en Coppel Emprende:
+${COPPEL_MODULES.join(", ")}
+
+Responde SOLO con JSON válido, sin texto extra:
+{
+  "score": <0-100>,
+  "score_label": "<Básico|En desarrollo|Listo|Destacado>",
+  "modulos_recomendados": [
+    { "nombre": "<nombre exacto>", "razon": "<máx 12 palabras>", "prioridad": <1|2|3> }
+  ],
+  "gaps": ["<gap en máx 8 palabras>"],
+  "turistas_objetivo": ["<nacionalidad>"],
+  "tip_rapido": "<acción concreta en máx 15 palabras>"
+}`;
+
+    try {
+      const res = await fetch("/api/diagnostico", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ negocioId: negocio.id, prompt }),
+      });
+      const data = await res.json();
+      return data.diagnostico ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   const createBusiness = async () => {
     setSuccessMsg("");
     setErrorMsg("");
@@ -230,7 +314,18 @@ export default function Dashboard() {
         );
       }
 
+      // Después del insert de negocio_images, en lugar de setSuccessMsg directo:
+      if (negocioData) {
+        // Lanzar diagnóstico en paralelo — no bloquea al usuario
+        setGenerandoDiagnostico(true);
+        generarDiagnostico(negocioData).then((diag) => {
+          setDiagnostico(diag);
+          setGenerandoDiagnostico(false);
+        });
+      }
+
       setSuccessMsg(t.createSuccess);
+      
       setName("");
       setCategory("");
       setDescription("");
@@ -887,6 +982,125 @@ export default function Dashboard() {
                 ✅ {successMsg}
               </div>
             )}
+            {/* Diagnóstico automático */}
+{generandoDiagnostico && (
+  <div style={{
+    background: "rgba(16,185,129,0.06)",
+    border: "1px solid rgba(16,185,129,0.15)",
+    borderRadius: "12px",
+    padding: "14px 16px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    fontSize: "0.88rem",
+    color: "var(--teal-lt)",
+  }}>
+    <div style={{
+      width: "16px", height: "16px", flexShrink: 0,
+      border: "2px solid var(--teal)", borderTopColor: "transparent",
+      borderRadius: "50%", animation: "spin 0.8s linear infinite",
+    }} />
+    Analizando tu negocio con IA...
+  </div>
+)}
+
+{diagnostico && (
+  <div style={{
+    background: "var(--surface2)",
+    border: "1px solid var(--border)",
+    borderRadius: "14px",
+    padding: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  }}>
+    {/* Score */}
+    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <div style={{
+        width: "56px", height: "56px", borderRadius: "50%",
+        background: `conic-gradient(var(--teal) ${diagnostico.score * 3.6}deg, var(--surface) 0deg)`,
+        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+      }}>
+        <div style={{
+          width: "42px", height: "42px", borderRadius: "50%",
+          background: "var(--surface2)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: "0.95rem", fontWeight: 700,
+        }}>
+          {diagnostico.score}
+        </div>
+      </div>
+      <div>
+        <div style={{ fontWeight: 700, fontSize: "1rem" }}>
+          Tu negocio está: <span style={{ color: "var(--teal)" }}>{diagnostico.score_label}</span>
+        </div>
+        <div style={{ fontSize: "0.82rem", color: "var(--muted)", marginTop: "2px" }}>
+          💡 {diagnostico.tip_rapido}
+        </div>
+      </div>
+    </div>
+
+    {/* Módulos recomendados */}
+    <div>
+      <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", 
+        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>
+        Módulos Coppel Emprende recomendados
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        {diagnostico.modulos_recomendados
+          .sort((a, b) => a.prioridad - b.prioridad)
+          .slice(0, 3)
+          .map((m, i) => (
+            <div key={i} style={{
+              display: "flex", alignItems: "flex-start", gap: "8px",
+              background: "var(--surface)", borderRadius: "8px", padding: "8px 10px",
+            }}>
+              <span style={{
+                background: "var(--teal)", color: "#fff",
+                borderRadius: "50%", width: "18px", height: "18px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.7rem", fontWeight: 700, flexShrink: 0, marginTop: "1px",
+              }}>{i + 1}</span>
+              <div>
+                <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{m.nombre}</div>
+                <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{m.razon}</div>
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+
+    {/* Gaps */}
+    {diagnostico.gaps.length > 0 && (
+      <div>
+        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)",
+          textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>
+          Lo que aún puedes mejorar
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+          {diagnostico.gaps.map((g, i) => (
+            <span key={i} style={{
+              fontSize: "0.78rem", padding: "3px 9px", borderRadius: "99px",
+              background: "rgba(239,68,68,0.08)", color: "var(--danger)",
+              border: "1px solid rgba(239,68,68,0.15)",
+            }}>⚠️ {g}</span>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* CTA a Coppel Emprende */}
+    <a
+      href="https://coppelemprende.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn btn-orange"
+      style={{ textAlign: "center", textDecoration: "none", padding: "10px", fontSize: "0.88rem" }}
+    >
+      Ir a Coppel Emprende →
+    </a>
+  </div>
+)}
             {errorMsg && (
               <div
                 style={{
