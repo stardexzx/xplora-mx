@@ -16,14 +16,14 @@ import "./Home.css";
 const RADIO_KM = 5;
 
 const LANGUAGES = [
-  { code: "es", flag: "MX" },
-  { code: "en", flag: "EN" },
-  { code: "pt", flag: "PT" },
-  { code: "fr", flag: "FR" },
-  { code: "de", flag: "DE" },
-  { code: "ja", flag: "JA" },
-  { code: "ko", flag: "KO" },
-  { code: "ar", flag: "AR" },
+  { code: "es", country: "mx" },
+  { code: "en", country: "us" },
+  { code: "pt", country: "br" },
+  { code: "fr", country: "fr" },
+  { code: "de", country: "de" },
+  { code: "ja", country: "jp" },
+  { code: "ko", country: "kr" },
+  { code: "ar", country: "sa" },
 ];
 
 // ── Price badge ──────────────────────────────────────────────────────────────
@@ -279,17 +279,31 @@ export default function Home() {
             </button>
 
             {/* Language */}
-            <div style={{ position:"relative" }}>
-              <button className="cp-ibtn" onClick={() => { setShowLangMenu(!showLangMenu); setShowUserMenu(false); }}>
-                {LANGUAGES.find((l) => l.code === lang)?.flag ?? "ES"}
+            <div style={{ position: "relative" }}>
+              <button
+                className="xp-ibtn"
+                onClick={() => {
+                  setShowLangMenu(!showLangMenu);
+                  setShowUserMenu(false);
+                }}
+              >
+                <span className={`fi fi-${LANGUAGES.find((l) => l.code === lang)?.country ?? "mx"}`} />
               </button>
               {showLangMenu && (
                 <div className="cp-drop" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", minWidth:"120px" }}>
                   {LANGUAGES.map((l) => (
-                    <button key={l.code} className="cp-dbtn center"
-                      style={{ color: l.code === lang ? "var(--light-blue)" : undefined }}
-                      onClick={() => { setLang(l.code); setShowLangMenu(false); }}>
-                      {l.flag}
+                    <button
+                      key={l.code}
+                      className="xp-dbtn center"
+                      style={{
+                        color: l.code === lang ? "var(--teal-lt)" : undefined,
+                      }}
+                      onClick={() => {
+                        setLang(l.code);
+                        setShowLangMenu(false);
+                      }}
+                    >
+                      <span className={`fi fi-${l.country}`} />
                     </button>
                   ))}
                 </div>

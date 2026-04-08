@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.82.0",
     "@react-google-maps/api": "^2.20.8",
     "@supabase/supabase-js": "^2.101.1",
+    "flag-icons": "^7.5.0",
     "next": "16.2.1",
     "qrcode": "^1.5.4",
     "react": "19.2.4",

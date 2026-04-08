@@ -29,10 +29,7 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
 
       if (toTranslate.length > 0) {
         // Mandar nombres y descripciones en una sola llamada (intercalados)
-        const texts = toTranslate.flatMap((n) => [
-          n.name ?? "",
-          n.description?.split(".")[0] ?? "", // Solo primer párrafo
-        ]);
+        const texts = toTranslate.map((n) => n.description?.split(".")[0] ?? "");
 
         try {
           const res = await fetch("/api/translateUI", {
@@ -46,8 +43,8 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
           // Guardar en caché de a pares
           toTranslate.forEach((n, i) => {
             cache.set(`${lang}:${n.id}`, {
-              name: translations[i * 2] ?? n.name,
-              description: translations[i * 2 + 1] ?? n.description ?? "",
+              name: n.name,
+              description: translations[i] ?? n.description ?? "",
             });
           });
         } catch {
@@ -58,6 +55,7 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
               description: n.description ?? "",
             });
           });
+
         }
       }
 

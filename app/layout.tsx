@@ -7,6 +7,7 @@ import {
   Courier_Prime,
 } from "next/font/google";
 import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 import { LangProvider } from "../context/LangContext";
 import { MapsProvider } from "../context/MapsContext";
 
