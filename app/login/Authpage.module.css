@@ -1,11 +1,9 @@
-/* Authpage.module.css — paleta Coppel */
+/* Authpage.module.css — paleta Coppel, valores hardcoded */
 
-/* ─── Variables ─────────────────────────────────────────────────────────────── */
-/* Usamos las variables del globals.css de Coppel donde existen,
-   y las complementamos con valores locales donde se necesita contexto claro. */
+/* ─── Body ──────────────────────────────────────────────────────────────────── */
 .body {
-  font-family: var(--font-body);          /* Poppins */
-  background: var(--dark-blue);           /* #081754 */
+  font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+  background: #020c1f;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -15,39 +13,37 @@
   overflow-x: hidden;
 }
 
-/* Gradiente decorativo de fondo — azul Coppel */
 .body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 10% 0%,   rgba(28, 66, 232, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 90% 100%,  rgba(28, 168, 247, 0.08) 0%, transparent 70%);
+    radial-gradient(ellipse 60% 50% at 10% 0%,  rgba(28,66,232,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(28,168,247,0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 
-/* Patrón de puntos */
 .body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(28, 66, 232, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(28,66,232,0.18) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 /* ─── Card ──────────────────────────────────────────────────────────────────── */
 .card {
   position: relative;
   z-index: 1;
-  background: var(--surface);             /* #05297A — mid-blue Coppel */
-  border: 1px solid var(--border-solid);  /* rgba(28,66,232,0.35) */
+  background: #020c1f;
+  border: 1px solid rgba(28,66,232,0.35);
   border-radius: 28px;
   width: 100%;
   max-width: 420px;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 40px rgba(8,23,84,0.7);
   animation: rise .55s cubic-bezier(.22,.68,0,1.2) both;
 }
 
@@ -58,22 +54,20 @@
 
 /* ─── Hero ──────────────────────────────────────────────────────────────────── */
 .hero {
-  /* Fondo más oscuro que el card: dark-blue */
-  background: var(--dark-blue);
-  border-bottom: 1px solid var(--border-solid);
+  background: #020c1f;
+  border-bottom: 1px solid rgba(28,66,232,0.3);
   padding: 1.2rem 2rem 1rem;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-/* Círculos decorativos con azul Coppel */
 .hero::before {
   content: '';
   position: absolute;
   width: 260px; height: 260px;
   border-radius: 50%;
-  border: 1.5px dashed rgba(28, 66, 232, 0.25);
+  border: 1.5px dashed rgba(28,66,232,0.3);
   top: -80px; left: 50%;
   transform: translateX(-50%);
 }
@@ -83,7 +77,7 @@
   position: absolute;
   width: 340px; height: 340px;
   border-radius: 50%;
-  border: 1.5px dashed rgba(28, 66, 232, 0.12);
+  border: 1.5px dashed rgba(28,66,232,0.15);
   top: -120px; left: 50%;
   transform: translateX(-50%);
 }
@@ -99,9 +93,9 @@
   width: 80px; height: 80px;
   object-fit: contain;
   border-radius: 50%;
-  background: var(--surface2);            /* #0c2060 */
+  background: #0c2060;
   padding: 8px;
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
   animation: spin-in .6s .1s cubic-bezier(.22,.68,0,1.2) both;
 }
 
@@ -109,11 +103,11 @@
   display: none;
   width: 80px; height: 80px;
   border-radius: 50%;
-  background: var(--surface2);
+  background: #0c2060;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
 }
 
 @keyframes spin-in {
@@ -122,20 +116,19 @@
 }
 
 .brandName {
-  font-family: var(--font-body);
+  font-family: 'Poppins', sans-serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--white);
+  color: #fff;
   letter-spacing: -0.01em;
   animation: fade-up .4s .2s both;
   margin-top: .15rem;
   line-height: 1.2;
 }
 
-/* Badge MX — amarillo Coppel sobre azul oscuro */
 .brandBadge {
-  background: var(--yellow);              /* #F0D224 */
-  color: var(--dark-blue);               /* #081754 — contraste AAA */
+  background: #F0D224;
+  color: #081754;
   padding: 1px 8px 2px;
   border-radius: 6px;
   font-size: .9rem;
@@ -147,7 +140,7 @@
 
 .brandSub {
   font-size: .72rem;
-  color: var(--muted);                    /* rgba(255,255,255,0.42) */
+  color: rgba(255,255,255,0.42);
   margin-top: 2px;
   letter-spacing: .02em;
   animation: fade-up .4s .28s both;
@@ -173,22 +166,21 @@
   padding: .55rem;
   font-size: .85rem;
   font-weight: 500;
-  color: var(--muted);
+  color: rgba(255,255,255,0.42);
   cursor: pointer;
   border: none;
-  border-bottom: 2px solid var(--border-solid);
+  border-bottom: 2px solid rgba(28,66,232,0.3);
   background: transparent;
-  font-family: var(--font-body);
+  font-family: 'Poppins', sans-serif;
   transition: all .25s;
   user-select: none;
 }
 
-.tab:hover { color: var(--light-blue); }
+.tab:hover { color: #1CA8F7; }
 
-/* Tab activo — azul Coppel */
 .activeTab {
-  color: var(--light-blue);
-  border-bottom-color: var(--blue);
+  color: #1CA8F7;
+  border-bottom-color: #1C42E8;
 }
 
 /* ─── User type row ─────────────────────────────────────────────────────────── */
@@ -207,40 +199,35 @@
   gap: .5rem;
   padding: .6rem;
   border-radius: 12px;
-  border: 1.5px solid var(--border-solid);
+  border: 1.5px solid rgba(28,66,232,0.35);
   cursor: pointer;
   font-size: .82rem;
   font-weight: 500;
-  color: var(--muted);
+  color: rgba(255,255,255,0.42);
   background: transparent;
   transition: all .22s;
-  font-family: var(--font-body);
+  font-family: 'Poppins', sans-serif;
 }
 
 .typeBtn:hover {
-  border-color: var(--blue);
-  color: var(--light-blue);
-  background: rgba(28, 66, 232, 0.1);
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.1);
 }
 
-/* Turista seleccionado — azul Coppel */
 .sel {
-  border-color: var(--blue);
-  color: var(--light-blue);
-  background: rgba(28, 66, 232, 0.15);
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.15);
 }
 
-/* Negocio seleccionado — amarillo Coppel */
 .selY {
-  border-color: var(--yellow);
-  color: var(--yellow);
-  background: rgba(240, 210, 36, 0.12);
+  border-color: #F0D224;
+  color: #F0D224;
+  background: rgba(240,210,36,0.12);
 }
 
-.ico {
-  font-size: 1.1rem;
-  line-height: 1;
-}
+.ico { font-size: 1.1rem; line-height: 1; }
 
 /* ─── Form ──────────────────────────────────────────────────────────────────── */
 .formBody {
@@ -251,16 +238,12 @@
   animation: fade-up .4s .45s both;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: .3rem;
-}
+.field { display: flex; flex-direction: column; gap: .3rem; }
 
 .label {
   font-size: .75rem;
   font-weight: 600;
-  color: var(--muted);
+  color: rgba(255,255,255,0.5);
   letter-spacing: .03em;
   text-transform: uppercase;
 }
@@ -269,11 +252,10 @@
 
 .inputIcon {
   position: absolute;
-  left: 13px;
-  top: 50%;
+  left: 13px; top: 50%;
   transform: translateY(-50%);
   width: 16px; height: 16px;
-  color: var(--muted);
+  color: rgba(255,255,255,0.4);
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -281,27 +263,27 @@
 
 .inputIcon svg { width: 16px; height: 16px; }
 
-/* Input — oscuro, igual que en dashboard */
+/* Inputs más claros sobre el fondo oscuro #020c1f */
 .input {
   width: 100%;
   padding: .72rem .9rem .72rem 2.4rem;
-  border: 1.5px solid var(--border-solid);
+  border: 1.5px solid rgba(28,66,232,0.5);
   border-radius: 12px;
   font-size: .9rem;
-  font-family: var(--font-body);
-  color: var(--white);
-  background: #03102e;                    /* oscuro — igual que dashboard */
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  background: #1a3a8f;
   outline: none;
   transition: border-color .2s, background .2s, box-shadow .2s;
 }
 
 .input:focus {
-  border-color: var(--blue);
-  background: rgba(28, 66, 232, 0.08);
-  box-shadow: 0 0 0 3px rgba(28, 66, 232, 0.18);
+  border-color: #1C42E8;
+  background: #1e44a8;
+  box-shadow: 0 0 0 3px rgba(28,66,232,0.25);
 }
 
-.input::placeholder { color: var(--muted); }
+.input::placeholder { color: rgba(255,255,255,0.45); }
 
 .eyeBtn {
   position: absolute;
@@ -309,62 +291,60 @@
   transform: translateY(-50%);
   background: none; border: none;
   cursor: pointer;
-  color: var(--muted);
+  color: rgba(255,255,255,0.4);
   padding: 2px;
   display: flex;
   align-items: center;
   transition: color .2s;
 }
 
-.eyeBtn:hover { color: var(--light-blue); }
+.eyeBtn:hover { color: #1CA8F7; }
 
 /* ─── Error box ─────────────────────────────────────────────────────────────── */
 .errorBox {
-  background: rgba(255, 89, 77, 0.08);
-  border: 1px solid rgba(255, 89, 77, 0.2);
+  background: rgba(255,89,77,0.08);
+  border: 1px solid rgba(255,89,77,0.25);
   border-radius: 8px;
   padding: 8px 12px;
-  color: var(--danger);                   /* --red Coppel */
+  color: #FF594D;
   font-size: 0.82rem;
 }
 
-/* ─── Main button ────────────────────────────────────────────────────────────── */
-/* Login → azul Coppel primario */
+/* ─── Botón principal ────────────────────────────────────────────────────────── */
 .btnMain {
   width: 100%;
   padding: .85rem;
   border-radius: 14px;
   border: none;
-  background: var(--blue);               /* #1C42E8 */
-  color: var(--white);
+  background: #1C42E8;
+  color: #fff;
   font-size: .95rem;
   font-weight: 600;
-  font-family: var(--font-body);
+  font-family: 'Poppins', sans-serif;
   cursor: pointer;
   letter-spacing: .01em;
   transition: background .2s, transform .15s, box-shadow .2s;
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
   margin-top: .2rem;
 }
 
 .btnMain:hover:not(:disabled) {
   background: #2954ff;
-  box-shadow: 0 6px 20px rgba(28, 66, 232, 0.45);
+  box-shadow: 0 6px 20px rgba(28,66,232,0.5);
 }
 
 .btnMain:active:not(:disabled) { transform: scale(.98); }
 .btnMain:disabled { opacity: .7; cursor: not-allowed; }
 
-/* Negocio → amarillo Coppel */
 .yellow {
-  background: var(--yellow) !important;
-  color: var(--dark-blue) !important;
-  box-shadow: var(--shadow-yellow) !important;
+  background: #F0D224 !important;
+  color: #081754 !important;
+  box-shadow: 0 4px 16px rgba(240,210,36,0.4) !important;
 }
 
 .yellow:hover:not(:disabled) {
   background: #ffe44a !important;
-  box-shadow: 0 6px 20px rgba(240, 210, 36, 0.45) !important;
+  box-shadow: 0 6px 20px rgba(240,210,36,0.5) !important;
 }
 
 /* ─── Shake ──────────────────────────────────────────────────────────────────── */
@@ -383,124 +363,81 @@
   text-align: center;
   padding: 0 1.5rem 1.4rem;
   font-size: .8rem;
-  color: var(--muted);
+  color: rgba(255,255,255,0.42);
   animation: fade-up .4s .5s both;
 }
 
-.cardFooter a {
-  color: var(--light-blue);
-  font-weight: 600;
-  text-decoration: none;
-}
-
+.cardFooter a { color: #1CA8F7; font-weight: 600; text-decoration: none; }
 .cardFooter a:hover { text-decoration: underline; }
 
 /* ─── Password strength ──────────────────────────────────────────────────── */
-.pwStrength {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-}
+.pwStrength { display: flex; gap: 4px; margin-top: 4px; }
 
 .pwBar {
-  height: 3px;
-  flex: 1;
+  height: 3px; flex: 1;
   border-radius: 99px;
-  background: var(--border-solid);
+  background: rgba(28,66,232,0.25);
   transition: background .3s;
 }
 
-.weak   { background: var(--danger); }
-.fair   { background: var(--orange); }
-.strong { background: var(--blue); }
+.weak   { background: #FF594D; }
+.fair   { background: #FFAE43; }
+.strong { background: #1C42E8; }
 
-/* ─── Checkbox row ───────────────────────────────────────────────────────── */
+/* ─── Checkbox ───────────────────────────────────────────────────────────── */
 .checkRow {
   display: flex;
   align-items: flex-start;
   gap: .5rem;
   font-size: .8rem;
-  color: var(--muted);
+  color: rgba(255,255,255,0.42);
   line-height: 1.5;
 }
 
 .checkbox {
-  width: 16px !important;
-  height: 16px !important;
-  accent-color: var(--blue);
-  flex-shrink: 0;
-  margin-top: 2px;
-  cursor: pointer;
+  width: 16px !important; height: 16px !important;
+  accent-color: #1C42E8;
+  flex-shrink: 0; margin-top: 2px; cursor: pointer;
 }
 
-.checkRow a { color: var(--light-blue); text-decoration: none; }
+.checkRow a { color: #1CA8F7; text-decoration: none; }
 .checkRow a:hover { text-decoration: underline; }
 
 /* ─── Name row ───────────────────────────────────────────────────────────── */
-.nameRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .6rem;
-}
+.nameRow { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .body {
-    align-items: flex-start;
-    padding: 0;
-  }
-
-  .card {
-    border-radius: 0;
-    box-shadow: none;
-    min-height: 100vh;
-    max-width: 100%;
-  }
-
-  .hero { padding: .9rem 2rem .8rem; }
-
+  .body       { align-items: flex-start; padding: 0; }
+  .card       { border-radius: 0; box-shadow: none; min-height: 100vh; max-width: 100%; }
+  .hero       { padding: .9rem 2rem .8rem; }
   .logoImg, .logoFallback { width: 64px; height: 64px; }
-
-  .brandName { font-size: 1.5rem; margin-top: .1rem; }
-  .brandSub  { font-size: .7rem; margin-top: 1px; }
-  .logoWrap  { margin-bottom: .35rem; }
-
-  .tabs      { padding: 1rem 1.25rem .2rem; }
-  .typeRow   { padding: .9rem 1.25rem .3rem; gap: .5rem; }
-  .typeBtn   { padding: .55rem .4rem; font-size: .79rem; }
-  .formBody  { padding: .85rem 1.25rem 1.25rem; gap: .7rem; }
-  .nameRow   { grid-template-columns: 1fr; }
-
-  .input   { font-size: 1rem; padding: .78rem .9rem .78rem 2.4rem; }
-  .btnMain { padding: .9rem; font-size: 1rem; }
-
+  .brandName  { font-size: 1.5rem; margin-top: .1rem; }
+  .brandSub   { font-size: .7rem; margin-top: 1px; }
+  .logoWrap   { margin-bottom: .35rem; }
+  .tabs       { padding: 1rem 1.25rem .2rem; }
+  .typeRow    { padding: .9rem 1.25rem .3rem; gap: .5rem; }
+  .typeBtn    { padding: .55rem .4rem; font-size: .79rem; }
+  .formBody   { padding: .85rem 1.25rem 1.25rem; gap: .7rem; }
+  .nameRow    { grid-template-columns: 1fr; }
+  .input      { font-size: 1rem; padding: .78rem .9rem .78rem 2.4rem; }
+  .btnMain    { padding: .9rem; font-size: 1rem; }
   .cardFooter { padding: 0 1.25rem 1.6rem; font-size: .82rem; }
 }
 
 @media (min-width: 768px) {
-  .body { padding: 2rem; align-items: center; min-height: 100vh; }
-
-  .card {
-    max-width: 460px;
-    border-radius: 32px;
-    box-shadow: var(--shadow-lg), 0 2px 8px rgba(0,0,0,.2);
-  }
-
-  .hero { padding: 1.4rem 2.5rem 1.1rem; }
-
+  .body  { padding: 2rem; align-items: center; min-height: 100vh; }
+  .card  { max-width: 460px; border-radius: 32px; box-shadow: 0 10px 40px rgba(8,23,84,0.8), 0 2px 8px rgba(0,0,0,0.3); }
+  .hero  { padding: 1.4rem 2.5rem 1.1rem; }
   .logoImg, .logoFallback { width: 88px; height: 88px; }
-
-  .brandName { font-size: 1.8rem; }
-
-  .tabs     { padding: 1.4rem 2rem .25rem; }
-  .typeRow  { padding: 1.1rem 2rem .4rem; }
-  .formBody { padding: 1.1rem 2rem 1.75rem; gap: .85rem; }
-
-  .input   { padding: .78rem 1rem .78rem 2.5rem; font-size: .92rem; }
-  .btnMain { padding: .9rem; font-size: 1rem; border-radius: 16px; }
-
+  .brandName  { font-size: 1.8rem; }
+  .tabs       { padding: 1.4rem 2rem .25rem; }
+  .typeRow    { padding: 1.1rem 2rem .4rem; }
+  .formBody   { padding: 1.1rem 2rem 1.75rem; gap: .85rem; }
+  .input      { padding: .78rem 1rem .78rem 2.5rem; font-size: .92rem; }
+  .btnMain    { padding: .9rem; font-size: 1rem; border-radius: 16px; }
   .cardFooter { padding: 0 2rem 1.6rem; font-size: .83rem; }
 }
 
