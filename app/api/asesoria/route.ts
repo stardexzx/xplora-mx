@@ -1,42 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 
-// Video oficial de Coppel Emprende (MP4 público en el servidor de Fundación Coppel)
-const VIDEO_COPPEL = "https://www.fundacioncoppel.org/wp-content/uploads/2024/02/coppel-comofuncionaenko.mp4";
-const REGISTRO_URL = "https://www.coppelemprende.com/coppelemprende";
-const FUNDACION_URL = "https://www.fundacioncoppel.org/coppel-emprende/";
-const ARTICULO_URL = "https://www.fundacioncoppel.org/2024/04/15/coppel-emprende-herramienta-para-transformar-tu-emprendimiento/";
+// ── Recursos de Coppel Emprende ──────────────────────────────────────────────
+const VIDEO_COPPEL  = "https://www.fundacioncoppel.org/wp-content/uploads/2024/02/coppel-comofuncionaenko.mp4";
+const REGISTRO_URL  = "https://www.coppelemprende.com/coppelemprende";
+const ARTICULO_URL  = "https://www.fundacioncoppel.org/2024/04/15/coppel-emprende-herramienta-para-transformar-tu-emprendimiento/";
 
-// Conocimiento real extraído de fundacioncoppel.org sobre los 5 componentes y temas
 const CONOCIMIENTO_COPPEL = `
 Coppel Emprende es un programa gratuito de Fundación Coppel para MiPyMEs mexicanas.
-Solo necesitas un número de celular para registrarte en: https://www.coppelemprende.com/coppelemprende
+Registro: https://www.coppelemprende.com/coppelemprende (solo necesitas celular)
 
-COMPONENTES DEL PROGRAMA (extraído de fundacioncoppel.org/coppel-emprende):
-1. Capacitación: Más de 90 lecciones en video On Demand sobre administración, finanzas, ventas, marketing, servicio al cliente y desarrollo personal.
-2. Fortalecimiento: Sesiones grupales en línea (webinars, talleres, master class) con expertos en tiempo real.
-3. Seminarios: Sesiones grupales sobre temas de actualidad aplicables a los negocios.
-4. Recompensas: Sistema de "llaves" canjeables por lectores de tarjeta bancaria, boletos de cine, audiolibros y más.
-5. Comunidad empresarial: Red de emprendedores para compartir experiencias y hacer negocios entre ellos.
+COMPONENTES:
+1. Capacitación: +90 lecciones en video sobre administración, finanzas, ventas, marketing, servicio al cliente.
+2. Fortalecimiento: Webinars, talleres y master class con expertos en tiempo real.
+3. Seminarios: Sesiones grupales sobre temas de actualidad.
+4. Recompensas: "Llaves" canjeables por lectores de tarjeta bancaria, boletos de cine, audiolibros.
+5. Comunidad: Red de emprendedores para compartir experiencias y hacer negocios.
 
-TEMAS CUBIERTOS:
-- Digitalización de negocios y pagos digitales
-- Formalización ante el SAT y registro de empresa
-- Educación financiera y manejo del dinero
-- Estrategias de ventas y atracción de clientes
-- Marketing digital y redes sociales
-- Servicio al cliente y fidelización
-- Liderazgo y empresa familiar
-- Mercadotecnia y promociones
+TEMAS CUBIERTOS: pagos digitales, formalización SAT, educación financiera, ventas, marketing digital, redes sociales, servicio al cliente, liderazgo, empresa familiar.
 
-BENEFICIOS DOCUMENTADOS:
-- 11,000+ personas registradas en la plataforma
-- 96% de satisfacción de usuarios
-- Gratuito, solo necesitas celular
-- Cursos en Abarrotes, Restaurantes, Pastelerías, Boutiques, Ventas en general
-
-SOBRE PAGOS DIGITALES ESPECÍFICAMENTE:
-El programa de recompensas de Coppel Emprende incluye lectores de tarjeta bancaria como premio por completar lecciones. Además hay lecciones específicas sobre digitalización y cómo aceptar pagos electrónicos sin efectivo.
+DATO CLAVE PAGOS: El sistema de recompensas incluye lectores de tarjeta bancaria gratis al completar lecciones.
 `;
 
 export interface AsesoriaMessage {
@@ -46,8 +28,12 @@ export interface AsesoriaMessage {
 
 export interface AsesoriaResult {
   respuesta: string;
+  problema: string;
+  categoria: string;
+  recomendacion: string;
+  acciones: string[];
+  aprendizaje: { tema: string; descripcion: string };
   mostrarVideo: boolean;
-  videoPoster?: string;
   temas: string[];
   accionPrincipal: string;
   registroUrl: string;
@@ -55,27 +41,12 @@ export interface AsesoriaResult {
   articuloUrl: string;
 }
 
-export async function POST(req: NextRequest) {
-  const { negocio, pregunta, historial = [] } = await req.json();
+// ── System prompt con el formato que pediste ─────────────────────────────────
+function buildSystemPrompt(negocio: Record<string, unknown>) {
+  return `Eres un asesor experto en negocios pequeños en México integrado en la app Xplora MX.
+Tu tarea es analizar el problema de un emprendedor y devolver recomendaciones prácticas, claras y accionables.
 
-  // Construir el historial de mensajes para conversación multi-turno
-  const messages: { role: "user" | "assistant"; content: string }[] = [];
-
-  // Agregar historial previo
-  for (const msg of historial) {
-    messages.push({ role: msg.role, content: msg.content });
-  }
-
-  // Agregar el mensaje actual del usuario
-  const mensajeUsuario = pregunta
-    ? pregunta
-    : `Analiza este negocio y dame consejos específicos de Coppel Emprende:\n- Nombre: ${negocio.name}\n- Categoría: ${negocio.category}\n- Descripción: ${negocio.description ?? "Sin descripción"}\n- Tags: ${negocio.tags ?? "Sin tags"}\n- Tiene teléfono: ${negocio.phone ? "Sí" : "No"}\n- Tiene sitio web: ${negocio.website ? "Sí" : "No"}\n- Calificación: ${negocio.rating ?? "Sin calificación"}`;
-
-  messages.push({ role: "user", content: mensajeUsuario });
-
-  const systemPrompt = `Eres el asistente de Coppel Emprende integrado en la app Xplora MX. Ayudas a dueños de negocios mexicanos con consejos prácticos basados en el programa de Fundación Coppel.
-
-NEGOCIO ACTUAL:
+Contexto del negocio actual:
 - Nombre: ${negocio.name}
 - Categoría: ${negocio.category}
 - Descripción: ${negocio.description ?? "Sin descripción"}
@@ -84,58 +55,133 @@ NEGOCIO ACTUAL:
 - Tiene sitio web: ${negocio.website ? "Sí" : "No"}
 - Calificación: ${negocio.rating ?? "Sin calificación"}
 
-CONOCIMIENTO DE COPPEL EMPRENDE:
+Información del programa Coppel Emprende (úsala en tus recomendaciones):
 ${CONOCIMIENTO_COPPEL}
 
-INSTRUCCIONES:
-- Responde siempre en español, de forma cálida y directa
-- Máximo 3-4 párrafos o bullet points cortos
-- Cita siempre recursos REALES de Coppel Emprende (lecciones, webinars, sistema de recompensas)
-- Si mencionas pagos con tarjeta: explica que Coppel Emprende regala lectores de tarjeta como recompensa por completar lecciones
-- Si el negocio no tiene web: menciona el módulo de redes sociales y digitalización
-- Si el rating es bajo o sin calificación: recomienda el módulo de servicio al cliente
-- Siempre termina con una acción concreta y el enlace de registro
-- NO inventes cursos o recursos que no existen en el conocimiento dado
+Instrucciones:
+1. Identifica el problema principal del negocio
+2. Clasifica el problema en una de estas categorías: ventas, marketing, pagos, finanzas, operaciones
+3. Da una recomendación concreta (qué debe hacer)
+4. Da 2-3 acciones simples paso a paso
+5. Sugiere aprender más con Coppel Emprende (menciona el módulo o tema específico relevante)
 
-FORMATO DE RESPUESTA (JSON puro, sin markdown):
+Reglas:
+- Usa lenguaje simple (como si hablaras con alguien sin experiencia técnica)
+- Sé directo, máximo 2-3 oraciones por campo
+- No uses tecnicismos complicados
+- Si el problema es pagos: menciona que Coppel Emprende regala lectores de tarjeta como recompensa
+- Si no tiene web: recomienda el módulo de marketing digital y redes sociales
+- Si el rating es bajo: recomienda el módulo de servicio al cliente
+
+Formato de respuesta (JSON puro, sin markdown, sin explicación):
 {
-  "respuesta": "texto de respuesta para el dueño del negocio",
-  "mostrarVideo": true/false (true si es la primera interacción o preguntan cómo funciona),
-  "temas": ["tema1", "tema2"],
-  "accionPrincipal": "acción específica y concreta en 1 oración"
+  "problema": "descripción breve del problema identificado",
+  "categoria": "ventas|marketing|pagos|finanzas|operaciones",
+  "recomendacion": "qué debe hacer concretamente",
+  "acciones": ["acción 1", "acción 2", "acción 3"],
+  "aprendizaje": {
+    "tema": "nombre del módulo o tema de Coppel Emprende",
+    "descripcion": "por qué este módulo le ayudaría"
+  },
+  "respuesta": "mensaje conversacional cálido resumiendo todo lo anterior en 2-3 oraciones",
+  "mostrarVideo": true,
+  "temas": ["categoria del problema"],
+  "accionPrincipal": "la acción más urgente en 1 oración"
 }`;
+}
+
+// ── OpenRouter fetch (compatible con OpenAI API) ──────────────────────────────
+async function callOpenRouter(
+  systemPrompt: string,
+  messages: { role: string; content: string }[]
+) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error("OPENROUTER_API_KEY no configurada");
+
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": "https://xploramx.com",
+      "X-Title": "XploraMX Asesoria",
+    },
+    body: JSON.stringify({
+      model: "anthropic/claude-haiku-4-5",   // puedes cambiar a openai/gpt-4o-mini, etc.
+      max_tokens: 700,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages,
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`OpenRouter error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
+}
+
+export async function POST(req: NextRequest) {
+  const { negocio, pregunta, historial = [] } = await req.json();
+
+  // Construir historial de mensajes
+  const messages: { role: string; content: string }[] = [];
+  for (const msg of historial as AsesoriaMessage[]) {
+    messages.push({ role: msg.role, content: msg.content });
+  }
+
+  // Mensaje actual — si no hay pregunta explícita, generamos el análisis inicial
+  const mensajeUsuario = pregunta
+    ? pregunta.replace("{{input}}", pregunta)   // compatibilidad con el template
+    : `Analiza mi negocio "${negocio.name}" (${negocio.category}) y dame recomendaciones. ${negocio.description ? `Descripción: ${negocio.description}.` : ""} ${negocio.tags ? `Tags: ${negocio.tags}.` : ""} ${!negocio.website ? "No tenemos sitio web." : ""} ${!negocio.phone ? "No tenemos teléfono registrado." : ""} ${negocio.rating ? `Calificación actual: ${negocio.rating}/5.` : "Sin calificación aún."}`;
+
+  messages.push({ role: "user", content: mensajeUsuario });
+
+  const systemPrompt = buildSystemPrompt(negocio as Record<string, unknown>);
 
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 600,
-      system: systemPrompt,
-      messages,
-    });
-
-    const raw = (response.content[0] as { text: string }).text;
+    const raw = await callOpenRouter(systemPrompt, messages);
     const clean = raw.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
 
     const result: AsesoriaResult = {
-      respuesta: parsed.respuesta ?? "Coppel Emprende puede ayudarte a hacer crecer tu negocio con capacitación gratuita.",
-      mostrarVideo: parsed.mostrarVideo ?? historial.length === 0,
-      temas: parsed.temas ?? ["general"],
+      problema:       parsed.problema       ?? "Tu negocio tiene oportunidades de mejora.",
+      categoria:      parsed.categoria      ?? "operaciones",
+      recomendacion:  parsed.recomendacion  ?? "Regístrate en Coppel Emprende para recibir capacitación gratuita.",
+      acciones:       parsed.acciones       ?? ["Regístrate en Coppel Emprende", "Completa las lecciones de tu área", "Aplica lo aprendido en tu negocio"],
+      aprendizaje:    parsed.aprendizaje    ?? { tema: "Capacitación general", descripcion: "Coppel Emprende tiene +90 lecciones gratuitas para tu negocio." },
+      respuesta:      parsed.respuesta      ?? "Coppel Emprende puede ayudarte con capacitación gratuita.",
+      mostrarVideo:   parsed.mostrarVideo   ?? historial.length === 0,
+      temas:          parsed.temas          ?? [parsed.categoria ?? "general"],
       accionPrincipal: parsed.accionPrincipal ?? "Regístrate gratis en Coppel Emprende con tu número de celular.",
-      registroUrl: REGISTRO_URL,
-      videoUrl: VIDEO_COPPEL,
-      articuloUrl: ARTICULO_URL,
+      registroUrl:    REGISTRO_URL,
+      videoUrl:       VIDEO_COPPEL,
+      articuloUrl:    ARTICULO_URL,
     };
 
     return NextResponse.json(result);
+
   } catch (e) {
     console.error("Asesoria error:", e);
+    // Fallback sin IA
     return NextResponse.json({
-      respuesta: "Coppel Emprende ofrece más de 90 lecciones gratuitas sobre ventas, finanzas, marketing digital y formalización. Solo necesitas tu celular para registrarte.",
+      problema: "No se pudo analizar el negocio automáticamente.",
+      categoria: "operaciones",
+      recomendacion: "Regístrate en Coppel Emprende para acceder a +90 lecciones gratuitas.",
+      acciones: [
+        "Entra a coppelemprende.com con tu celular",
+        "Completa las lecciones de ventas y marketing",
+        "Aplica los consejos en tu negocio esta semana",
+      ],
+      aprendizaje: { tema: "Capacitación general", descripcion: "Coppel Emprende cubre ventas, finanzas, pagos digitales y más." },
+      respuesta: "Coppel Emprende ofrece más de 90 lecciones gratuitas. Solo necesitas tu celular para registrarte.",
       mostrarVideo: true,
       temas: ["general"],
-      accionPrincipal: "Regístrate gratis en coppelemprende.com con tu número de celular.",
+      accionPrincipal: "Regístrate gratis en Coppel Emprende.",
       registroUrl: REGISTRO_URL,
       videoUrl: VIDEO_COPPEL,
       articuloUrl: ARTICULO_URL,
