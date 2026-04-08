@@ -372,22 +372,24 @@ export default function Home() {
                 flex: 1,
               }}
             >
-              <div className="cp-logo-icon">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2.5"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                  <circle cx="12" cy="10" r="3" />
+            <div className="cp-logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
                 </svg>
-              </div>
-              <span className="cp-logo-text">
-                Local<span className="cp-logo-badge">IA</span>
-              </span>
+            </div>
+            <div style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.2)", margin: "0 4px" }} />
+            <img
+                src="/MexiGoLogo.png"
+                alt="MexiGo"
+style={{ height: "34px", objectFit: "contain", maxWidth: "110px" }}
+            />
+<div style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.2)", margin: "0 4px" }} />
+<img
+  src="/CoppelLogo.png"
+  alt="Coppel"
+style={{ height: "34px", objectFit: "contain", maxWidth: "110px" }
+}/>
             </div>
 
             <button
