@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "../services/supabase";
-import { Negocio } from "../types/negocio";
+import { supabase, getMenusByNegocio } from "../services/supabase";
+import { Negocio, Menu } from "../types/negocio";
 import { useLang } from "../context/LangContext";
 import { LatLng } from "../services/geo";
 import { TravelMode, RouteRequest } from "./Map";
@@ -77,6 +77,12 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
   const [showWriteReview, setShowWriteReview] = useState(false);
   const [rating, setRating] = useState(5);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Estados para menú modal
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [loadingMenus, setLoadingMenus] = useState(false);
+  const [expandedMenuId, setExpandedMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -107,6 +113,21 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
       .order("created_at", { ascending: false });
     setReviews((data ?? []) as Review[]);
     setLoadingReviews(false);
+  };
+
+  const loadMenus = async () => {
+    setLoadingMenus(true);
+    try {
+      const data = await getMenusByNegocio(negocio.id);
+      setMenus(data);
+      if (data.length > 0) {
+        setExpandedMenuId(data[0].id);
+      }
+    } catch (error) {
+      console.error("Error loading menus:", error);
+      setMenus([]);
+    }
+    setLoadingMenus(false);
   };
 
   useEffect(() => {
@@ -361,6 +382,18 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12h18M13 6l6 6-6 6"/></svg>
                 Cómo llegar
               </a>
+
+              <button onClick={() => { setShowMenuModal(true); loadMenus(); }}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                  marginTop: "8px", width: "100%", padding: "11px 20px", borderRadius: "999px",
+                  background: "rgba(240, 210, 36, 0.12)", color: NAVY.yellow, border: `1.5px solid rgba(240, 210, 36, 0.4)`,
+                  fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.875rem",
+                  cursor: "pointer", transition: "all 0.18s",
+                }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16v12H4z"/><path d="M4 4L2 2m20 0l2-2m-9 16v4m-4 0h8"/></svg>
+                 Ver menú
+              </button>
             </div>
           )}
 
@@ -623,6 +656,145 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
           })()}
         </div>
       </div>
+
+      {/* ── MODAL DE VER MENÚ ─────────────────────────────────────────┐ */}
+      {showMenuModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 9999, padding: "16px"
+        }} onClick={() => setShowMenuModal(false)}>
+          <div style={{
+            background: NAVY.bg, border: `1px solid ${NAVY.border}`, borderRadius: "16px",
+            maxWidth: "500px", width: "100%", maxHeight: "80vh", overflow: "auto",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)"
+          }} onClick={(e) => e.stopPropagation()}>
+            
+            {/* Encabezado del modal */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "20px", borderBottom: `1px solid ${NAVY.border}`
+            }}>
+              <h2 style={{ margin: 0, color: NAVY.text, fontSize: "1.2rem", fontWeight: 700 }}>
+                📋 {negocio.name}
+              </h2>
+              <button onClick={() => setShowMenuModal(false)} 
+                style={{
+                  background: "none", border: "none", color: NAVY.muted, cursor: "pointer",
+                  fontSize: "1.5rem", padding: "0", width: "32px", height: "32px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "color 0.18s"
+                }} onMouseEnter={(e) => e.currentTarget.style.color = NAVY.lightBlue}
+                onMouseLeave={(e) => e.currentTarget.style.color = NAVY.muted}>
+                ✕
+              </button>
+            </div>
+
+            {/* Contenido del modal */}
+            <div style={{ padding: "20px" }}>
+              {loadingMenus ? (
+                <div style={{ textAlign: "center", color: NAVY.muted, padding: "40px 20px" }}>
+                  <p>Cargando menú...</p>
+                </div>
+              ) : menus.length === 0 ? (
+                <div style={{ textAlign: "center", color: NAVY.muted, padding: "40px 20px" }}>
+                  <p>Este negocio no tiene menú disponible</p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {menus.map((menu) => (
+                    <div key={menu.id} style={{ border: `1px solid ${NAVY.border}`, borderRadius: "8px", overflow: "hidden" }}>
+                      
+                      {/* Encabezado del menú */}
+                      <button onClick={() => setExpandedMenuId(expandedMenuId === menu.id ? null : menu.id)}
+                        style={{
+                          width: "100%", border: "none",
+                          padding: "12px 16px", cursor: "pointer", display: "flex", alignItems: "center",
+                          justifyContent: "space-between", background: NAVY.surface, transition: "background 0.18s"
+                        }} onMouseEnter={(e) => e.currentTarget.style.background = NAVY.surface2}
+                        onMouseLeave={(e) => e.currentTarget.style.background = NAVY.surface}>
+                        <div style={{ textAlign: "left" }}>
+                          <p style={{ margin: 0, color: NAVY.text, fontWeight: 600, fontSize: "0.95rem" }}>
+                            🍽️ {menu.name}
+                          </p>
+                          {menu.description && (
+                            <p style={{ margin: "4px 0 0", color: NAVY.muted, fontSize: "0.8rem" }}>
+                              {menu.description}
+                            </p>
+                          )}
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={NAVY.lightBlue} strokeWidth="2"
+                          style={{ flexShrink: 0, transition: "transform 0.18s", 
+                            transform: expandedMenuId === menu.id ? "rotate(180deg)" : "rotate(0deg)" }}>
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </button>
+
+                      {/* Contenido expandible del menú */}
+                      {expandedMenuId === menu.id && menu.menu_categories && menu.menu_categories.length > 0 && (
+                        <div style={{ background: NAVY.bg, borderTop: `1px solid ${NAVY.border}`, padding: "12px" }}>
+                          {menu.menu_categories.map((category) => (
+                            <div key={category.id} style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: `1px solid ${NAVY.border}` }}>
+                              
+                              {/* Categoría */}
+                              <p style={{ margin: 0, color: NAVY.yellow, fontWeight: 600, fontSize: "0.9rem", marginBottom: "8px" }}>
+                                📌 {category.name}
+                              </p>
+
+                              {/* Ítems de la categoría */}
+                              {category.menu_items && category.menu_items.length > 0 ? (
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                  {category.menu_items.map((item) => (
+                                    <div key={item.id} style={{
+                                      display: "flex", gap: "12px", padding: "8px",
+                                      background: NAVY.surface, borderRadius: "6px", alignItems: "flex-start"
+                                    }}>
+                                      {/* Imagen del item */}
+                                      {item.image_url && (
+                                        <img src={item.image_url} alt={item.name} style={{
+                                          width: "50px", height: "50px", borderRadius: "4px", 
+                                          objectFit: "cover", flexShrink: 0
+                                        }} />
+                                      )}
+                                      
+                                      {/* Info del item */}
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+                                          <p style={{ margin: 0, color: NAVY.text, fontWeight: 500, fontSize: "0.85rem" }}>
+                                            {item.name}
+                                          </p>
+                                          {item.price && (
+                                            <span style={{ color: NAVY.yellow, fontWeight: 700, fontSize: "0.85rem", whiteSpace: "nowrap" }}>
+                                              ${item.price.toFixed(2)}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {item.description && (
+                                          <p style={{ margin: "4px 0 0", color: NAVY.muted, fontSize: "0.75rem", lineHeight: 1.3 }}>
+                                            {item.description}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p style={{ margin: "0 8px", color: NAVY.muted, fontSize: "0.8rem", fontStyle: "italic" }}>
+                                  Sin ítems aún
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

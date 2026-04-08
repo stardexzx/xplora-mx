@@ -6,6 +6,7 @@ import { GoogleMap, Marker } from "@react-google-maps/api";
 import { supabase } from "../../services/supabase";
 import { uploadImage } from "../../services/cloudinary";
 import { useMaps } from "../../context/MapsContext";
+import MenuManager from "../../component/MenuManager";
 import s from "./MisNegocios.module.css";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -99,7 +100,7 @@ export default function MisNegocios() {
   const [loadingNegocios, setLoadingNegocios] = useState(true);
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"info" | "fotos" | "resenas">("info");
+  const [activeTab, setActiveTab] = useState<"info" | "fotos" | "resenas" | "menus">("info");
 
   const [editName, setEditName]               = useState("");
   const [editCategory, setEditCategory]       = useState("");
@@ -128,7 +129,10 @@ export default function MisNegocios() {
   const [savingReply, setSavingReply]       = useState<string | null>(null);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
@@ -272,7 +276,7 @@ export default function MisNegocios() {
       <div className={s.root}>
 
         {/* HEADER */}
-        <div className={`${s.header} ${isMobile ? s.headerMobile : ""}`}>
+        <div className={`${s.header} ${mounted && isMobile ? s.headerMobile : ""}`}>
           <button className={s.logoBtn} onClick={() => router.push("/")}>
             <div className={s.logoIcon}>🌎</div>
             <span className={s.logoName}>Xplora<span className={s.logoBadge}>MX</span></span>
@@ -281,17 +285,17 @@ export default function MisNegocios() {
           <span className={s.breadcrumbLabel}>Mis negocios</span>
           <div className={s.headerActions}>
             <button className={s.btnPrimarySmall} onClick={() => router.push("/dashboard")}>
-              {isMobile ? "+" : "+ Registrar"}
+              {mounted && isMobile ? "+" : "+ Registrar"}
             </button>
             <button className={s.btnGhost} onClick={() => router.push("/")}>←</button>
           </div>
         </div>
 
         {/* LAYOUT */}
-        <div className={`${s.layout} ${isMobile ? s.layoutMobile : ""}`}>
+        <div className={`${s.layout} ${mounted && isMobile ? s.layoutMobile : ""}`}>
 
           {/* SIDEBAR */}
-          <div className={`${s.sidebar} ${isMobile ? s.sidebarMobile : ""}`}>
+          <div className={`${s.sidebar} ${mounted && isMobile ? s.sidebarMobile : ""}>`}>
             {loadingNegocios ? (
               <p className={s.loadingText}>Cargando...</p>
             ) : negocios.length === 0 ? (
@@ -321,9 +325,9 @@ export default function MisNegocios() {
 
           {/* PANEL */}
           {editingNegocio ? (
-            <div className={`${s.editPanel} ${isMobile ? s.editPanelMobile : ""}`}>
+            <div className={`${s.editPanel} ${mounted && isMobile ? s.editPanelMobile : ""}`}>
 
-              <div className={`${s.editHeader} ${isMobile ? s.editHeaderMobile : ""}`}>
+              <div className={`${s.editHeader} ${mounted && isMobile ? s.editHeaderMobile : ""}`}>
                 <div>
                   <h2 className={s.editTitle}>{editingNegocio.name}</h2>
                   <p className={s.editSubtitle}>{editingNegocio.category}</p>
@@ -338,14 +342,14 @@ export default function MisNegocios() {
 
               {/* Tabs */}
               <div className={s.tabs}>
-                {(["info", "fotos", "resenas"] as const).map(tab => (
+                {(["info", "fotos", "resenas", "menus"] as const).map(tab => (
                   <button key={tab} className={`${s.tab} ${activeTab === tab ? s.tabActive : ""}`} onClick={() => setActiveTab(tab)}>
-                    {tab === "info" ? "Información" : tab === "fotos" ? `Fotos (${currentImages.length})` : `Reseñas (${reviews.length})`}
+                    {tab === "info" ? "Información" : tab === "fotos" ? `Fotos (${currentImages.length})` : tab === "resenas" ? `Reseñas (${reviews.length})` : "Menús"}
                   </button>
                 ))}
               </div>
 
-              <div className={`${s.editContent} ${isMobile ? s.editContentMobile : ""}`}>
+              <div className={`${s.editContent} ${mounted && isMobile ? s.editContentMobile : ""}`}>
 
                 {/* ═══ TAB INFO ═══ */}
                 {activeTab === "info" && (
@@ -551,6 +555,13 @@ export default function MisNegocios() {
                           </div>
                         </div>
                       ))}
+                  </div>
+                )}
+
+                {/* ═══ TAB MENÚS ═══ */}
+                {activeTab === "menus" && (
+                  <div>
+                    <MenuManager negocio_id={editingId || ""} />
                   </div>
                 )}
               </div>
