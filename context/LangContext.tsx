@@ -40,6 +40,23 @@ const BASE_ES = {
   qrDownload: "Descargar QR",
   qrHint: "Sin descargas. Solo escanea con la cámara de tu teléfono.",
   translating: "Traduciendo...",
+  infoTab: "Información",
+  reviewsTab: "Reseñas",
+  routeTab: "Ruta",
+  howToGetThere: "Cómo llegar",
+  writeReview: "Escribir reseña",
+  loadingReviews: "Cargando reseñas...",
+  noReviews: "Sin reseñas aún",
+  directions: "Indicaciones",
+  locationRequired: "Activa tu ubicación",
+  selectTransport: "Selecciona un transporte para calcular",
+  profile: "Mi perfil",
+  myBusinesses: "Mis negocios",
+  adminPanel: "Panel admin",
+  viewMenu: "Ver menú",
+  loadingMenu: "Cargando menú...",
+  menuUnavailable: "Este negocio no tiene menú disponible",
+  noMenuItems: "Sin ítems aún"
 };
 
 export type T = typeof BASE_ES;

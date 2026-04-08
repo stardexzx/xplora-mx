@@ -317,12 +317,12 @@ export default function Home() {
                 {showUserMenu && (
                   <div className="cp-drop">
                     {[
-                      { label:"Mi perfil", href:"/perfil" },
+                      { label:t.profile, href:"/perfil" },
                       ...(user?.user_metadata?.user_type === "negocio" ? [
-                        { label:"Mis negocios", href:"/mis-negocios" },
-                        { label:"Registrar negocio", href:"/dashboard" },
+                        { label:t.myBusinesses, href:"/mis-negocios" },
+                        { label:t.registerBusiness, href:"/dashboard" },
                       ] : []),
-                      ...(isAdmin ? [{ label:"Panel admin", href:"/admin" }] : []),
+                      ...(isAdmin ? [{ label:t.adminPanel, href:"/admin" }] : []),
                     ].map((item) => (
                       <button key={item.href} className="cp-dbtn" onClick={() => { window.location.href = item.href; setShowUserMenu(false); }}>
                         {item.label}

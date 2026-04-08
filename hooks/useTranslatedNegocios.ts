@@ -1,77 +1,88 @@
-// hooks/useTranslatedNegocios.ts
 import { useState, useEffect, useRef } from "react";
 import { Negocio } from "../types/negocio";
 
-const cache = new Map<string, { name: string; description: string }>();
+type CacheItem = {
+  name: string;
+  description: string;
+  tags?: string;
+  category?: string;
+  opening_hours?: string;
+};
+
+const cache = new Map<string, CacheItem>();
 
 export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
   const [translated, setTranslated] = useState<Negocio[]>(negocios);
   const pendingRef = useRef(false);
 
   useEffect(() => {
-    if (lang === "es") {
+    // 1. Casos base: Español o lista vacía
+    if (lang === "es" || negocios.length === 0) {
       setTranslated(negocios);
       return;
     }
-    if (negocios.length === 0) {
-      setTranslated([]);
-      return;
-    }
-    if (pendingRef.current) return;
 
     const translate = async () => {
-      pendingRef.current = true;
+      if (pendingRef.current) return;
 
-      // Separar los que ya están en caché
-      const toTranslate = negocios.filter(
-        (n) => !cache.has(`${lang}:${n.id}`)
-      );
+      // 2. Filtrar negocios que no están en caché
+      const toTranslate = negocios.filter(n => !cache.has(`${lang}:${n.id}`));
 
       if (toTranslate.length > 0) {
-        // Mandar nombres y descripciones en una sola llamada (intercalados)
-        const texts = toTranslate.map((n) => n.description?.split(".")[0] ?? "");
+        pendingRef.current = true;
+        
+        // 3. Preparar los textos (4 strings por negocio)
+        const textsToFetch = toTranslate.flatMap(n => [
+          n.description || "",
+          n.tags || "",
+          n.category || "",
+          n.opening_hours || ""
+        ]);
 
         try {
           const res = await fetch("/api/translateUI", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ texts, lang }),
+            body: JSON.stringify({ texts: textsToFetch, lang }),
           });
+          
           const data = await res.json();
-          const translations: string[] = data.translations ?? texts;
+          const translations: string[] = data.translations || textsToFetch;
 
-          // Guardar en caché de a pares
+          // 4. Guardar resultados en caché
           toTranslate.forEach((n, i) => {
+            const baseIndex = i * 4;
             cache.set(`${lang}:${n.id}`, {
-              name: n.name,
-              description: translations[i] ?? n.description ?? "",
+              name: n.name, // El nombre no se traduce según tu comentario
+              description: translations[baseIndex] || n.description || "",
+              tags: translations[baseIndex + 1] || n.tags || "",
+              category: translations[baseIndex + 2] || n.category || "",
+              opening_hours: translations[baseIndex + 3] || n.opening_hours || ""
             });
           });
-        } catch {
-          // Si falla, usar originales
-          toTranslate.forEach((n) => {
-            cache.set(`${lang}:${n.id}`, {
-              name: n.name,
-              description: n.description ?? "",
-            });
-          });
-
+        } catch (error) {
+          console.error("Error translating:", error);
+          // Opcional: llenar caché con originales para evitar re-intentos infinitos
+        } finally {
+          pendingRef.current = false;
         }
       }
 
-      // Aplicar caché a todos
+      // 5. Construir la lista final combinando datos originales + caché
       const result = negocios.map((n) => {
         const cached = cache.get(`${lang}:${n.id}`);
         if (!cached) return n;
+        
         return {
           ...n,
-          name: cached.name,
           description: cached.description,
+          tags: cached.tags,
+          category: cached.category,
+          opening_hours: cached.opening_hours,
         };
       });
 
       setTranslated(result);
-      pendingRef.current = false;
     };
 
     translate();
