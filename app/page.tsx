@@ -26,31 +26,6 @@ const LANGUAGES = [
   { code: "ar", flag: "AR" },
 ];
 
-// ── Price badge ──────────────────────────────────────────────────────────────
-function PriceBadge({ tags }: { tags?: string }) {
-  if (!tags) return null;
-  const t = tags.toLowerCase();
-  if (t.includes("económico") || t.includes("barato") || t.includes("economico"))
-    return (
-      <span className="cp badge-green" style={{ fontSize: "0.72rem", fontWeight: 700 }}>
-        $ Económico
-      </span>
-    );
-  if (t.includes("moderado"))
-    return (
-      <span className="cp badge-amber" style={{ fontSize: "0.72rem", fontWeight: 700 }}>
-        $$ Moderado
-      </span>
-    );
-  if (t.includes("premium") || t.includes("lujoso"))
-    return (
-      <span className="cp badge-yellow" style={{ fontSize: "0.72rem", fontWeight: 700 }}>
-        $$$ Premium
-      </span>
-    );
-  return null;
-}
-
 const CAT_EMOJI: Record<string, string> = {
   comida: "🌮",
   tours: "🧭",
@@ -107,22 +82,44 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    supabase
-      .from("negocios")
-      .select("*, negocio_images(url, order_index)")
-      .eq("status", "approved")
-      .then(({ data, error }) => {
-        if (!error && data) {
-          const enriched = data.map((n: any) => ({
-            ...n,
-            images: (n.negocio_images ?? [])
-              .sort((a: any, b: any) => a.order_index - b.order_index)
-              .map((i: any) => i.url),
-          })) as Negocio[];
-          setTodos(enriched);
-          setNegocios(enriched);
+    const fetchNegocios = async () => {
+      const { data, error } = await supabase
+        .from("negocios")
+        .select("*, negocio_images(url, order_index)")
+        .eq("status", "approved");
+
+      if (error || !data) return;
+
+      const { data: allReviews } = await supabase
+        .from("reviews")
+        .select("negocio_id, rating");
+
+      const ratingMap: Record<string, number> = {};
+      if (allReviews) {
+        const grouped: Record<string, number[]> = {};
+        for (const r of allReviews) {
+          if (!grouped[r.negocio_id]) grouped[r.negocio_id] = [];
+          grouped[r.negocio_id].push(r.rating);
         }
-      });
+        for (const [id, ratings] of Object.entries(grouped)) {
+          const avg = ratings.reduce((s, r) => s + r, 0) / ratings.length;
+          ratingMap[id] = Math.round(avg * 10) / 10;
+        }
+      }
+
+      const enriched = data.map((n: any) => ({
+        ...n,
+        rating: ratingMap[n.id] ?? null,
+        images: (n.negocio_images ?? [])
+          .sort((a: any, b: any) => a.order_index - b.order_index)
+          .map((i: any) => i.url),
+      })) as Negocio[];
+
+      setTodos(enriched);
+      setNegocios(enriched);
+    };
+
+    fetchNegocios();
   }, []);
 
   useEffect(() => {
@@ -479,17 +476,23 @@ export default function Home() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p className="cp-card__name">{n.name}</p>
                       <p className="cp-card__desc">{n.description?.split(".")[0] ?? n.category}</p>
-                      <PriceBadge tags={n.tags} />
+                      <div style={{ display: "flex", alignItems: "center", gap: "3px", marginTop: "5px" }}>
+                        {[1,2,3,4,5].map(s => (
+                          <svg key={s} width="12" height="12" viewBox="0 0 24 24"
+                            fill={s <= Math.round(n.rating ?? 0) ? "#F0D224" : "none"}
+                            stroke={s <= Math.round(n.rating ?? 0) ? "#F0D224" : "rgba(255,255,255,0.3)"}
+                            strokeWidth="1.5">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ))}
+                        {n.rating != null && n.rating > 0 && (
+                          <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "#F0D224", marginLeft: "3px" }}>
+                            {n.rating.toFixed(1)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "5px", flexShrink: 0 }}>
-                      {n.rating != null && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--yellow)" stroke="var(--yellow)" strokeWidth="1">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                          </svg>
-                          <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--text2)" }}>{n.rating.toFixed(1)}</span>
-                        </div>
-                      )}
                       {dist && <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>{dist}</span>}
                     </div>
                   </div>
@@ -515,7 +518,6 @@ export default function Home() {
                 }}
                 onClick={() => setSelected(null)}
               >
-                {/* Marcador de ubicación del usuario */}
                 {userLocation && (
                   <Marker
                     position={userLocation}
@@ -529,7 +531,6 @@ export default function Home() {
                     }}
                   />
                 )}
-                {/* Marcadores de negocios */}
                 {negociosToShow.map((n) => {
                   if (!n.lat || !n.lng) return null;
                   const isSelected = n.id === selectedNegocio?.id;
@@ -609,7 +610,6 @@ export default function Home() {
   );
 }
 
-// Estilo oscuro neutro del mapa — igual que en dashboard-coppel
 const darkMapStyle = [
   { elementType: "geometry", stylers: [{ color: "#1a1a1a" }] },
   { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a1a" }] },
