@@ -13,34 +13,48 @@ interface Message {
 
 // ── Paleta Coppel / Home.css ─────────────────────────────────────────────────
 const C = {
-  bg:          "#03112a",   // fondo principal
-  bgDark:      "#020e22",   // header / nav
-  bgCard:      "#04193d",   // cards
-  bgCardHover: "#061f4a",   // hover cards
-  blue:        "#1c42e8",   // acento principal
-  blueDim:     "rgba(28,66,232,0.15)",
-  blueBorder:  "rgba(28,66,232,0.25)",
-  blueHover:   "#2954ff",
-  lightBlue:   "#5b8aff",   // texto activo
-  yellow:      "#F0D224",   // badge / acento secundario
-  yellowDark:  "#c8aa00",
-  text:        "#e8eaf6",   // texto principal
-  text2:       "#8fa3c8",   // texto secundario
-  muted:       "#4d6080",   // texto apagado
-  danger:      "#ff594d",
-  white:       "#ffffff",
+  bg: "#03112a", // fondo principal
+  bgDark: "#020e22", // header / nav
+  bgCard: "#04193d", // cards
+  bgCardHover: "#061f4a", // hover cards
+  blue: "#1c42e8", // acento principal
+  blueDim: "rgba(28,66,232,0.15)",
+  blueBorder: "rgba(28,66,232,0.25)",
+  blueHover: "#2954ff",
+  lightBlue: "#5b8aff", // texto activo
+  yellow: "#F0D224", // badge / acento secundario
+  yellowDark: "#c8aa00",
+  text: "#e8eaf6", // texto principal
+  text2: "#8fa3c8", // texto secundario
+  muted: "#4d6080", // texto apagado
+  danger: "#ff594d",
+  white: "#ffffff",
 };
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 const IconSend = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" width="14" height="14">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2.5"
+    width="14"
+    height="14"
+  >
     <line x1="22" y1="2" x2="11" y2="13" />
     <polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 );
 
 const RobotAvatar = ({ size = 13 }: { size?: number }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" width={size} height={size}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    width={size}
+    height={size}
+  >
     <rect x="3" y="8" width="18" height="13" rx="3" />
     <circle cx="9" cy="14" r="1.5" fill="white" />
     <circle cx="15" cy="14" r="1.5" fill="white" />
@@ -52,7 +66,14 @@ const RobotAvatar = ({ size = 13 }: { size?: number }) => (
 // ── Typing indicator ─────────────────────────────────────────────────────────
 function TypingIndicator() {
   return (
-    <div style={{ display: "flex", gap: "4px", alignItems: "center", padding: "4px 0" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "4px",
+        alignItems: "center",
+        padding: "4px 0",
+      }}
+    >
       {[0, 1, 2].map((i) => (
         <span
           key={i}
@@ -155,13 +176,19 @@ export default function ChatbotWidget() {
     // TODO: reemplaza con tu llamada a interpretQuery / IA real
     setTimeout(() => {
       setIsTyping(false);
-      addMessage("bot", "Déjame ayudarte con eso. ¿Puedes darme más detalles para recomendarte mejor?");
+      addMessage(
+        "bot",
+        "Déjame ayudarte con eso. ¿Puedes darme más detalles para recomendarte mejor?",
+      );
     }, 1000);
   };
 
   const handleSend = () => sendMessage(inputValue);
   const handleSuggestion = (text: string) => sendMessage(text);
-  const handleOpen = () => { setIsOpen(true); setShowBadge(false); };
+  const handleOpen = () => {
+    setIsOpen(true);
+    setShowBadge(false);
+  };
 
   return (
     <div
@@ -219,8 +246,15 @@ export default function ChatbotWidget() {
               <RobotAvatar size={18} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
-                Asistente XploraMX
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.text,
+                  lineHeight: 1.2,
+                }}
+              >
+                Asistente LocalIA
               </div>
               <div
                 style={{
@@ -261,7 +295,14 @@ export default function ChatbotWidget() {
                 color: C.text2,
               }}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="12" height="12">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                width="12"
+                height="12"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -284,7 +325,10 @@ export default function ChatbotWidget() {
           >
             {messages.map((msg) =>
               msg.role === "bot" ? (
-                <div key={msg.id} style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+                <div
+                  key={msg.id}
+                  style={{ display: "flex", gap: 8, alignItems: "flex-end" }}
+                >
                   <div
                     style={{
                       width: 26,
@@ -308,13 +352,23 @@ export default function ChatbotWidget() {
                       maxWidth: 240,
                     }}
                   >
-                    <p style={{ fontSize: 13, color: C.text, lineHeight: 1.5, margin: 0 }}>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: C.text,
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
                       {msg.text}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div key={msg.id} style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div
+                  key={msg.id}
+                  style={{ display: "flex", justifyContent: "flex-end" }}
+                >
                   <div
                     style={{
                       background: C.blue,
@@ -324,12 +378,19 @@ export default function ChatbotWidget() {
                       boxShadow: "0 4px 20px rgba(28,66,232,0.35)",
                     }}
                   >
-                    <p style={{ fontSize: 13, color: C.white, lineHeight: 1.5, margin: 0 }}>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: C.white,
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
                       {msg.text}
                     </p>
                   </div>
                 </div>
-              )
+              ),
             )}
 
             {isTyping && (
@@ -439,7 +500,8 @@ export default function ChatbotWidget() {
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: !inputValue.trim() || isTyping ? C.bgCardHover : C.blue,
+                background:
+                  !inputValue.trim() || isTyping ? C.bgCardHover : C.blue,
                 border: `1px solid ${!inputValue.trim() || isTyping ? C.blueBorder : C.blue}`,
                 cursor: !inputValue.trim() || isTyping ? "default" : "pointer",
                 display: "flex",
@@ -447,7 +509,10 @@ export default function ChatbotWidget() {
                 justifyContent: "center",
                 flexShrink: 0,
                 transition: "background 0.15s",
-                boxShadow: !inputValue.trim() || isTyping ? "none" : "0 4px 16px rgba(28,66,232,0.35)",
+                boxShadow:
+                  !inputValue.trim() || isTyping
+                    ? "none"
+                    : "0 4px 16px rgba(28,66,232,0.35)",
               }}
             >
               <IconSend />
@@ -475,7 +540,8 @@ export default function ChatbotWidget() {
           boxShadow: isOpen ? "none" : "0 4px 20px rgba(28,66,232,0.4)",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.08)";
+          (e.currentTarget as HTMLButtonElement).style.transform =
+            "scale(1.08)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
@@ -506,13 +572,28 @@ export default function ChatbotWidget() {
         )}
 
         {isOpen ? (
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" width="18" height="18">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            width="18"
+            height="18"
+          >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         ) : (
           // Carita robot
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, pointerEvents: "none" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+              pointerEvents: "none",
+            }}
+          >
             <div style={{ display: "flex", gap: 5 }}>
               {[0, 1].map((i) => (
                 <div
@@ -527,7 +608,14 @@ export default function ChatbotWidget() {
                     justifyContent: "center",
                   }}
                 >
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.blue }} />
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: "50%",
+                      background: C.blue,
+                    }}
+                  />
                 </div>
               ))}
             </div>

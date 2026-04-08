@@ -279,7 +279,7 @@ export default function MisNegocios() {
         <div className={`${s.header} ${isMobile ? s.headerMobile : ""}`}>
           <button className={s.logoBtn} onClick={() => router.push("/")}>
             <div className={s.logoIcon}>🌎</div>
-            <span className={s.logoName}>Xplora<span className={s.logoBadge}>MX</span></span>
+            <span className={s.logoName}>Local<span className={s.logoBadge}>IA</span></span>
           </button>
           <span className={s.breadcrumb}>/</span>
           <span className={s.breadcrumbLabel}>Mis negocios</span>

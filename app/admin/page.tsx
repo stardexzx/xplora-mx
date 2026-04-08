@@ -493,12 +493,12 @@ export default function AdminPanel() {
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem",
             }}>🌎</div>
             <span style={{ fontFamily: "var(--font-body)", fontWeight: 800, fontSize: "0.95rem" }}>
-              Xplora
+              Local
               <span style={{
                 background: "var(--yellow)", color: "var(--dark-blue)",
                 padding: "1px 6px 2px", borderRadius: "5px",
                 fontSize: "0.68rem", fontWeight: 700, marginLeft: "4px",
-              }}>MX</span>
+              }}>IA</span>
             </span>
           </button>
 

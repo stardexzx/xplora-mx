@@ -47,7 +47,9 @@ export default function Dashboard() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string[]>(
+    [],
+  );
   const [diagnostico, setDiagnostico] = useState<null | {
     score: number;
     score_label: string;
@@ -87,7 +89,10 @@ export default function Dashboard() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [markerPos, setMarkerPos] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
   const [latInput, setLatInput] = useState("");
   const [lngInput, setLngInput] = useState("");
@@ -215,7 +220,7 @@ export default function Dashboard() {
 
     const prompt = `Eres experto en microempresas turísticas para el Mundial FIFA 2026 en México.
 
-Negocio registrado en XploraMX:
+Negocio registrado en LocalIA:
 - Nombre: ${negocio.name}
 - Categoría: ${negocio.category}
 - Descripción: "${negocio.description || "sin descripción"}"
@@ -325,7 +330,7 @@ Responde SOLO con JSON válido, sin texto extra:
       }
 
       setSuccessMsg(t.createSuccess);
-      
+
       setName("");
       setCategory("");
       setDescription("");
@@ -381,7 +386,8 @@ Responde SOLO con JSON válido, sin texto extra:
                 height: "38px",
                 borderRadius: "10px",
                 // ✅ Antes: linear-gradient(135deg, var(--teal), var(--teal-dk))
-                background: "linear-gradient(135deg, var(--blue), var(--dark-blue))",
+                background:
+                  "linear-gradient(135deg, var(--blue), var(--dark-blue))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -397,7 +403,7 @@ Responde SOLO con JSON válido, sin texto extra:
                 fontSize: "1.1rem",
               }}
             >
-              Xplora
+              Local
               <span
                 style={{
                   // ✅ Antes: background: "var(--orange)" — ahora usamos --blue para mantener coherencia Coppel
@@ -410,7 +416,7 @@ Responde SOLO con JSON válido, sin texto extra:
                   marginLeft: "4px",
                 }}
               >
-                MX
+                IA
               </span>
             </span>
           </div>
@@ -480,7 +486,11 @@ Responde SOLO con JSON válido, sin texto extra:
                   >
                     <img
                       src={src}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                     <button
                       onClick={() => removeImage(i)}
@@ -554,7 +564,13 @@ Responde SOLO con JSON válido, sin texto extra:
                 onChange={handleImageChange}
                 style={{ display: "none" }}
               />
-              <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "6px" }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--muted)",
+                  marginTop: "6px",
+                }}
+              >
                 La primera foto será la imagen principal
               </p>
             </div>
@@ -567,7 +583,6 @@ Responde SOLO con JSON válido, sin texto extra:
                 placeholder="Ej. Tacos El Güero"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-
               />
             </div>
 
@@ -575,7 +590,11 @@ Responde SOLO con JSON válido, sin texto extra:
             <div>
               <label style={labelStyle}>Categoría *</label>
               <div
-                style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "8px",
+                }}
               >
                 {CATS.map((c) => (
                   <button
@@ -592,12 +611,18 @@ Responde SOLO con JSON válido, sin texto extra:
                       textAlign: "left",
                       transition: "all 0.15s",
                       // ✅ Antes: borderColor: "var(--teal)" / background: "var(--teal-a)" / color: "var(--teal-lt)"
-                      borderColor: category === c.value ? "var(--blue)" : "var(--border-solid)",
+                      borderColor:
+                        category === c.value
+                          ? "var(--blue)"
+                          : "var(--border-solid)",
                       background:
                         category === c.value
                           ? "rgba(28, 66, 232, 0.15)"
                           : "var(--surface2)",
-                      color: category === c.value ? "var(--light-blue)" : "var(--text)",
+                      color:
+                        category === c.value
+                          ? "var(--light-blue)"
+                          : "var(--text)",
                     }}
                   >
                     {c.label}
@@ -643,18 +668,28 @@ Responde SOLO con JSON válido, sin texto extra:
                       fontFamily: "var(--font-body)",
                       transition: "all 0.15s",
                       // ✅ Antes: var(--teal) / var(--teal-a) / var(--teal-lt)
-                      borderColor: selectedTags.includes(tag) ? "var(--blue)" : "var(--border-solid)",
+                      borderColor: selectedTags.includes(tag)
+                        ? "var(--blue)"
+                        : "var(--border-solid)",
                       background: selectedTags.includes(tag)
                         ? "rgba(28, 66, 232, 0.15)"
                         : "var(--surface2)",
-                      color: selectedTags.includes(tag) ? "var(--light-blue)" : "var(--text)",
+                      color: selectedTags.includes(tag)
+                        ? "var(--light-blue)"
+                        : "var(--text)",
                     }}
                   >
                     {tag}
                   </button>
                 ))}
               </div>
-              <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "6px" }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--muted)",
+                  marginTop: "6px",
+                }}
+              >
                 Selecciona todas las que apliquen a tu negocio
               </p>
             </div>
@@ -698,7 +733,13 @@ Responde SOLO con JSON válido, sin texto extra:
                   </button>
                 ))}
               </div>
-              <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "6px" }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--muted)",
+                  marginTop: "6px",
+                }}
+              >
                 Selecciona todas las que apliquen a tu negocio
               </p>
             </div>
@@ -711,7 +752,6 @@ Responde SOLO con JSON válido, sin texto extra:
                 placeholder="Ej: +52 222 123 4567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-
               />
             </div>
 
@@ -723,14 +763,19 @@ Responde SOLO con JSON válido, sin texto extra:
                 placeholder="Ej: www.minegocio.mx"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
-
               />
             </div>
 
             {/* HORARIO */}
             <div>
               <label style={labelStyle}>Horario</label>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
                 {[
                   { key: "lunes", label: "Lunes" },
                   { key: "martes", label: "Martes" },
@@ -766,13 +811,29 @@ Responde SOLO con JSON válido, sin texto extra:
                             },
                           }))
                         }
-                        style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          cursor: "pointer",
+                        }}
                       />
-                      <span style={{ minWidth: "70px", fontSize: "0.9rem", fontWeight: 500 }}>
+                      <span
+                        style={{
+                          minWidth: "70px",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        }}
+                      >
                         {label}
                       </span>
                       {day.abierto ? (
-                        <div style={{ display: "flex", gap: "8px", marginLeft: "auto" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "8px",
+                            marginLeft: "auto",
+                          }}
+                        >
                           <input
                             type="time"
                             value={day.inicio}
@@ -794,7 +855,11 @@ Responde SOLO con JSON válido, sin texto extra:
                               fontSize: "0.85rem",
                             }}
                           />
-                          <span style={{ color: "var(--muted)", fontWeight: 500 }}>–</span>
+                          <span
+                            style={{ color: "var(--muted)", fontWeight: 500 }}
+                          >
+                            –
+                          </span>
                           <input
                             type="time"
                             value={day.fin}
@@ -819,7 +884,11 @@ Responde SOLO con JSON válido, sin texto extra:
                         </div>
                       ) : (
                         <span
-                          style={{ marginLeft: "auto", fontSize: "0.85rem", color: "var(--muted)" }}
+                          style={{
+                            marginLeft: "auto",
+                            fontSize: "0.85rem",
+                            color: "var(--muted)",
+                          }}
                         >
                           Cerrado
                         </span>
@@ -845,13 +914,23 @@ Responde SOLO con JSON válido, sin texto extra:
                   className="btn btn-ghost"
                   onClick={handleMyLocation}
                   disabled={locating}
-                  style={{ fontSize: "0.75rem", padding: "4px 10px", height: "auto" }}
+                  style={{
+                    fontSize: "0.75rem",
+                    padding: "4px 10px",
+                    height: "auto",
+                  }}
                 >
                   {locating ? "⏳" : "📍"} Mi ubicación
                 </button>
               </div>
 
-              <p style={{ fontSize: "0.78rem", color: "var(--muted)", marginBottom: "10px" }}>
+              <p
+                style={{
+                  fontSize: "0.78rem",
+                  color: "var(--muted)",
+                  marginBottom: "10px",
+                }}
+              >
                 Haz clic en el mapa para colocar el pin de tu negocio
               </p>
 
@@ -930,7 +1009,9 @@ Responde SOLO con JSON válido, sin texto extra:
                 }}
               >
                 <div>
-                  <label style={{ ...labelStyle, marginBottom: "4px" }}>Latitud</label>
+                  <label style={{ ...labelStyle, marginBottom: "4px" }}>
+                    Latitud
+                  </label>
                   <input
                     className="input"
                     placeholder="19.0414"
@@ -940,7 +1021,9 @@ Responde SOLO con JSON válido, sin texto extra:
                   />
                 </div>
                 <div>
-                  <label style={{ ...labelStyle, marginBottom: "4px" }}>Longitud</label>
+                  <label style={{ ...labelStyle, marginBottom: "4px" }}>
+                    Longitud
+                  </label>
                   <input
                     className="input"
                     placeholder="-98.2063"
@@ -961,7 +1044,8 @@ Responde SOLO con JSON válido, sin texto extra:
                     textAlign: "center",
                   }}
                 >
-                  ✅ Ubicación seleccionada — también puedes arrastrar el pin para ajustar
+                  ✅ Ubicación seleccionada — también puedes arrastrar el pin
+                  para ajustar
                 </p>
               )}
             </div>
@@ -983,124 +1067,226 @@ Responde SOLO con JSON válido, sin texto extra:
               </div>
             )}
             {/* Diagnóstico automático */}
-{generandoDiagnostico && (
-  <div style={{
-    background: "rgba(16,185,129,0.06)",
-    border: "1px solid rgba(16,185,129,0.15)",
-    borderRadius: "12px",
-    padding: "14px 16px",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    fontSize: "0.88rem",
-    color: "var(--teal-lt)",
-  }}>
-    <div style={{
-      width: "16px", height: "16px", flexShrink: 0,
-      border: "2px solid var(--teal)", borderTopColor: "transparent",
-      borderRadius: "50%", animation: "spin 0.8s linear infinite",
-    }} />
-    Analizando tu negocio con IA...
-  </div>
-)}
-
-{diagnostico && (
-  <div style={{
-    background: "var(--surface2)",
-    border: "1px solid var(--border)",
-    borderRadius: "14px",
-    padding: "1.25rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  }}>
-    {/* Score */}
-    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <div style={{
-        width: "56px", height: "56px", borderRadius: "50%",
-        background: `conic-gradient(var(--teal) ${diagnostico.score * 3.6}deg, var(--surface) 0deg)`,
-        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-      }}>
-        <div style={{
-          width: "42px", height: "42px", borderRadius: "50%",
-          background: "var(--surface2)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "0.95rem", fontWeight: 700,
-        }}>
-          {diagnostico.score}
-        </div>
-      </div>
-      <div>
-        <div style={{ fontWeight: 700, fontSize: "1rem" }}>
-          Tu negocio está: <span style={{ color: "var(--teal)" }}>{diagnostico.score_label}</span>
-        </div>
-        <div style={{ fontSize: "0.82rem", color: "var(--muted)", marginTop: "2px" }}>
-          💡 {diagnostico.tip_rapido}
-        </div>
-      </div>
-    </div>
-
-    {/* Módulos recomendados */}
-    <div>
-      <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", 
-        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>
-        Módulos Coppel Emprende recomendados
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-        {diagnostico.modulos_recomendados
-          .sort((a, b) => a.prioridad - b.prioridad)
-          .slice(0, 3)
-          .map((m, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "flex-start", gap: "8px",
-              background: "var(--surface)", borderRadius: "8px", padding: "8px 10px",
-            }}>
-              <span style={{
-                background: "var(--teal)", color: "#fff",
-                borderRadius: "50%", width: "18px", height: "18px",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.7rem", fontWeight: 700, flexShrink: 0, marginTop: "1px",
-              }}>{i + 1}</span>
-              <div>
-                <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{m.nombre}</div>
-                <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{m.razon}</div>
+            {generandoDiagnostico && (
+              <div
+                style={{
+                  background: "rgba(16,185,129,0.06)",
+                  border: "1px solid rgba(16,185,129,0.15)",
+                  borderRadius: "12px",
+                  padding: "14px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "0.88rem",
+                  color: "var(--teal-lt)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    flexShrink: 0,
+                    border: "2px solid var(--teal)",
+                    borderTopColor: "transparent",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                Analizando tu negocio con IA...
               </div>
-            </div>
-          ))}
-      </div>
-    </div>
+            )}
 
-    {/* Gaps */}
-    {diagnostico.gaps.length > 0 && (
-      <div>
-        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)",
-          textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>
-          Lo que aún puedes mejorar
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-          {diagnostico.gaps.map((g, i) => (
-            <span key={i} style={{
-              fontSize: "0.78rem", padding: "3px 9px", borderRadius: "99px",
-              background: "rgba(239,68,68,0.08)", color: "var(--danger)",
-              border: "1px solid rgba(239,68,68,0.15)",
-            }}>⚠️ {g}</span>
-          ))}
-        </div>
-      </div>
-    )}
+            {diagnostico && (
+              <div
+                style={{
+                  background: "var(--surface2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "14px",
+                  padding: "1.25rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {/* Score */}
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  <div
+                    style={{
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "50%",
+                      background: `conic-gradient(var(--teal) ${diagnostico.score * 3.6}deg, var(--surface) 0deg)`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "42px",
+                        height: "42px",
+                        borderRadius: "50%",
+                        background: "var(--surface2)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.95rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {diagnostico.score}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "1rem" }}>
+                      Tu negocio está:{" "}
+                      <span style={{ color: "var(--teal)" }}>
+                        {diagnostico.score_label}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.82rem",
+                        color: "var(--muted)",
+                        marginTop: "2px",
+                      }}
+                    >
+                      💡 {diagnostico.tip_rapido}
+                    </div>
+                  </div>
+                </div>
 
-    {/* CTA a Coppel Emprende */}
-    <a
-      href="https://coppelemprende.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="btn btn-orange"
-      style={{ textAlign: "center", textDecoration: "none", padding: "10px", fontSize: "0.88rem" }}
-    >
-      Ir a Coppel Emprende →
-    </a>
-  </div>
-)}
+                {/* Módulos recomendados */}
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      color: "var(--muted)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Módulos Coppel Emprende recomendados
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                    }}
+                  >
+                    {diagnostico.modulos_recomendados
+                      .sort((a, b) => a.prioridad - b.prioridad)
+                      .slice(0, 3)
+                      .map((m, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "8px",
+                            background: "var(--surface)",
+                            borderRadius: "8px",
+                            padding: "8px 10px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              background: "var(--teal)",
+                              color: "#fff",
+                              borderRadius: "50%",
+                              width: "18px",
+                              height: "18px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              flexShrink: 0,
+                              marginTop: "1px",
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                          <div>
+                            <div
+                              style={{ fontSize: "0.85rem", fontWeight: 600 }}
+                            >
+                              {m.nombre}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "0.78rem",
+                                color: "var(--muted)",
+                              }}
+                            >
+                              {m.razon}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Gaps */}
+                {diagnostico.gaps.length > 0 && (
+                  <div>
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        color: "var(--muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: "6px",
+                      }}
+                    >
+                      Lo que aún puedes mejorar
+                    </div>
+                    <div
+                      style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}
+                    >
+                      {diagnostico.gaps.map((g, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            fontSize: "0.78rem",
+                            padding: "3px 9px",
+                            borderRadius: "99px",
+                            background: "rgba(239,68,68,0.08)",
+                            color: "var(--danger)",
+                            border: "1px solid rgba(239,68,68,0.15)",
+                          }}
+                        >
+                          ⚠️ {g}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* CTA a Coppel Emprende */}
+                <a
+                  href="https://coppelemprende.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-orange"
+                  style={{
+                    textAlign: "center",
+                    textDecoration: "none",
+                    padding: "10px",
+                    fontSize: "0.88rem",
+                  }}
+                >
+                  Ir a Coppel Emprende →
+                </a>
+              </div>
+            )}
             {errorMsg && (
               <div
                 style={{
@@ -1115,6 +1301,36 @@ Responde SOLO con JSON válido, sin texto extra:
               >
                 ⚠️ {errorMsg}
               </div>
+            )}
+
+            {/* Botón para acceder a mis-negocios cuando el diagnóstico se completa */}
+            {diagnostico && (
+              <button
+                onClick={() => router.push("/mis-negocios")}
+                style={{
+                  width: "100%",
+                  padding: "16px 20px",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                  background: "var(--blue)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  marginBottom: "12px",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--dark-blue)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--blue)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                📊 Ir a Mis Negocios →
+              </button>
             )}
 
             {/* ✅ Antes: btn-orange (no existía) → ahora btn-accent (amarillo Coppel, alta visibilidad) */}

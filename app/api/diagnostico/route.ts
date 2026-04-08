@@ -25,8 +25,8 @@ for (const model of MODELS) {
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "HTTP-Referer": "https://xploramx.com",
-      "X-Title": "XploraMX",
+      "HTTP-Referer": "https://localIA.com",
+      "X-Title": "LocalIA",
     },
     body: JSON.stringify({
       model,
