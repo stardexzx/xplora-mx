@@ -1,0 +1,957 @@
+/* MisNegocios.module.css — paleta Coppel, misma base que Authpage */
+
+/* ─── Fuentes ────────────────────────────────────────────────────────────────── */
+/* Importar en el componente via <link> o en _app */
+
+/* ─── Tokens internos (hardcoded, misma paleta que Authpage) ─────────────────
+   bg:        #020c1f
+   surface:   #0a1628
+   surface2:  #111e36
+   border:    rgba(28,66,232,0.35)
+   teal:      #1CA8F7   (azul Coppel claro)
+   teal-dk:   #1C42E8   (azul Coppel oscuro)
+   teal-a:    rgba(28,168,247,0.10)
+   orange:    #F0D224   (amarillo Coppel)
+   text:      #fff
+   muted:     rgba(255,255,255,0.42)
+   danger:    #FF594D
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Wrapper raíz ──────────────────────────────────────────────────────────── */
+.root {
+  min-height: 100vh;
+  background: #020c1f;
+  font-family: 'DM Sans', 'Poppins', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Fondo con gradientes radiales + grid de puntos igual que Authpage */
+.root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%,  rgba(28,66,232,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(28,168,247,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(28,66,232,0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  opacity: 0.45;
+  z-index: 0;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  background: rgba(2,12,31,0.95);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+
+.headerMobile {
+  padding: 12px 16px;
+}
+
+.logoBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+
+.logoIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1CA8F7, #1C42E8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.logoName {
+  font-family: 'Syne', 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.logoBadge {
+  background: #F0D224;
+  color: #081754;
+  padding: 1px 6px 2px;
+  border-radius: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.breadcrumb {
+  color: rgba(28,66,232,0.6);
+}
+
+.breadcrumbLabel {
+  color: rgba(255,255,255,0.42);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.headerActions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── Layout principal ──────────────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: calc(100vh - 57px);
+  position: relative;
+  z-index: 1;
+}
+
+.layoutMobile {
+  flex-direction: column;
+  height: auto;
+}
+
+/* ─── Lista de negocios (sidebar) ──────────────────────────────────────────── */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(28,66,232,0.35);
+  overflow-y: auto;
+  background: #0a1628;
+}
+
+.sidebarMobile {
+  width: 100%;
+  border-right: none;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  overflow-y: visible;
+}
+
+.sidebarEmpty {
+  padding: 2rem;
+  text-align: center;
+}
+
+.sidebarEmptyText {
+  color: rgba(255,255,255,0.42);
+  margin-bottom: 1rem;
+}
+
+/* ─── Card de negocio en la lista ──────────────────────────────────────────── */
+.negocioItem {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(28,66,232,0.2);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.negocioItem:hover {
+  background: rgba(28,66,232,0.06);
+}
+
+.negocioItemActive {
+  background: rgba(28,168,247,0.06);
+  border-left-color: #1CA8F7;
+}
+
+.negocioThumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #111e36;
+  border: 1px solid rgba(28,66,232,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.negocioThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.negocioInfo { flex: 1; min-width: 0; }
+
+.negocioName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.negocioCategory {
+  margin: 2px 0 6px;
+  color: rgba(255,255,255,0.42);
+  font-size: 0.78rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ─── Panel de edición ──────────────────────────────────────────────────────── */
+.editPanel {
+  flex: 1;
+  overflow-y: auto;
+  background: #020c1f;
+  min-height: 0;
+}
+
+.editPanelMobile {
+  min-height: auto;
+}
+
+/* Sub-header del negocio seleccionado */
+.editHeader {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0a1628;
+}
+
+.editHeaderMobile {
+  padding: 12px 16px;
+}
+
+.editTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.editSubtitle {
+  margin: 0;
+  color: rgba(255,255,255,0.42);
+  font-size: 0.82rem;
+}
+
+.editHeaderActions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── Tabs ──────────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  background: #0a1628;
+}
+
+.tab {
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.42);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover { color: #1CA8F7; }
+
+.tabActive {
+  color: #1CA8F7;
+  border-bottom-color: #1C42E8;
+}
+
+/* ─── Contenido del panel ───────────────────────────────────────────────────── */
+.editContent {
+  padding: 1.5rem 2rem;
+  max-width: 640px;
+}
+
+.editContentMobile {
+  padding: 1rem;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Etiquetas de campo ────────────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.labelSm {
+  margin-bottom: 4px;
+}
+
+/* ─── Inputs ────────────────────────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border: 1.5px solid rgba(28,66,232,0.5);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #fff;
+  background: #111e36;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #1C42E8;
+  background: #1a2d52;
+  box-shadow: 0 0 0 3px rgba(28,66,232,0.25);
+}
+
+.input::placeholder { color: rgba(255,255,255,0.35); }
+
+.textarea {
+  resize: vertical;
+}
+
+/* ─── Grid de categorías ────────────────────────────────────────────────────── */
+.catGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.catBtn {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(28,66,232,0.35);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: inherit;
+  background: #111e36;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.2s;
+}
+
+.catBtn:hover {
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.12);
+}
+
+.catBtnActive {
+  border-color: #1C42E8;
+  background: rgba(28,66,232,0.18);
+  color: #1CA8F7;
+}
+
+/* ─── Grid lat/lng ──────────────────────────────────────────────────────────── */
+.coordGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ─── Mapa ──────────────────────────────────────────────────────────────────── */
+.mapWrap {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(28,66,232,0.35);
+  height: 220px;
+  margin-bottom: 10px;
+  background: #111e36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.42);
+}
+
+/* ─── Mensaje de guardado ───────────────────────────────────────────────────── */
+.saveMsg {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+}
+
+.saveMsgOk {
+  background: rgba(28,168,247,0.08);
+  border: 1px solid rgba(28,168,247,0.25);
+  color: #1CA8F7;
+}
+
+.saveMsgErr {
+  background: rgba(255,89,77,0.08);
+  border: 1px solid rgba(255,89,77,0.25);
+  color: #FF594D;
+}
+
+/* ─── Botones ───────────────────────────────────────────────────────────────── */
+.btnPrimary {
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: none;
+  background: #1C42E8;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
+  width: 100%;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #2954ff;
+  box-shadow: 0 6px 20px rgba(28,66,232,0.5);
+}
+
+.btnPrimary:active:not(:disabled) { transform: scale(0.98); }
+.btnPrimary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btnPrimarySmall {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #1C42E8;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(28,66,232,0.35);
+}
+
+.btnPrimarySmall:hover:not(:disabled) { background: #2954ff; }
+.btnPrimarySmall:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btnDanger {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,89,77,0.4);
+  background: rgba(255,89,77,0.08);
+  color: #FF594D;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btnDanger:hover { background: rgba(255,89,77,0.15); border-color: #FF594D; }
+
+.btnGhost {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(28,66,232,0.35);
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btnGhost:hover { border-color: #1CA8F7; color: #1CA8F7; }
+
+/* ─── Fotos ─────────────────────────────────────────────────────────────────── */
+.photosHint {
+  color: rgba(255,255,255,0.42);
+  font-size: 0.85rem;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.photoItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(28,66,232,0.35);
+}
+
+.photoItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photoDeleteBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(255,89,77,0.85);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.photoDeleteBtn:hover { background: #FF594D; }
+
+.photoPrimaryBadge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: #1C42E8;
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.photoNew {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px dashed #1CA8F7;
+  opacity: 0.8;
+}
+
+.photoNew img { width: 100%; height: 100%; object-fit: cover; }
+
+.photoNewOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(28,66,232,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoNewLabel {
+  color: #1CA8F7;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.photoAddBtn {
+  aspect-ratio: 1;
+  border: 2px dashed rgba(28,66,232,0.4);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #111e36;
+  color: rgba(255,255,255,0.42);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.photoAddBtn:hover {
+  border-color: #1CA8F7;
+  color: #1CA8F7;
+}
+
+.photoAddIcon { font-size: 1.4rem; }
+.photoAddText { font-size: 0.72rem; }
+
+/* ─── Reseñas ───────────────────────────────────────────────────────────────── */
+.reviewCard {
+  background: #0a1628;
+  border: 1px solid rgba(28,66,232,0.35);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(8,23,84,0.4);
+}
+
+.reviewTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.reviewStars { display: flex; gap: 4px; align-items: center; }
+
+.reviewStar {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.reviewStarFilled { background: #1CA8F7; }
+.reviewStarEmpty  { background: #111e36; }
+
+.reviewRatingLabel {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.42);
+  margin-left: 6px;
+}
+
+.reviewActions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.reviewDate {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.42);
+}
+
+.btnDeleteReview {
+  background: none;
+  border: none;
+  color: #FF594D;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: inherit;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btnDeleteReview:hover { background: rgba(255,89,77,0.1); }
+
+.reviewComment {
+  margin: 0 0 10px;
+  font-size: 0.88rem;
+  color: #fff;
+  line-height: 1.5;
+}
+
+.reviewReply {
+  background: rgba(28,66,232,0.08);
+  border: 1px solid rgba(28,66,232,0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.reviewReplyLabel {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  color: #1CA8F7;
+  font-weight: 600;
+}
+
+.reviewReplyText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.reviewReplyRow {
+  display: flex;
+  gap: 8px;
+}
+
+.reviewReplyInput {
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+/* ─── Estado vacío (panel derecho sin selección) ────────────────────────────── */
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.42);
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.emptyStateText { font-size: 0.9rem; }
+
+/* ─── Cargando ──────────────────────────────────────────────────────────────── */
+.loadingText {
+  color: rgba(255,255,255,0.42);
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .catGrid { grid-template-columns: 1fr 1fr; }
+  .editContent { padding: 1rem; }
+}
+
+/* ─── Chips (etiquetas y métodos de pago) ───────────────────────────────────── */
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.chip {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(28,66,232,0.4);
+  background: #111e36;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.12);
+}
+
+.chipActive {
+  border-color: #1C42E8;
+  background: rgba(28,66,232,0.22);
+  color: #fff;
+  font-weight: 600;
+}
+
+.chipHint {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+}
+
+/* ─── Horario ────────────────────────────────────────────────────────────────── */
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scheduleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(28,66,232,0.35);
+  background: #111e36;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.scheduleRow:hover {
+  border-color: rgba(28,66,232,0.6);
+}
+
+.scheduleRowClosed {
+  background: rgba(2,12,31,0.6);
+  border-color: rgba(28,66,232,0.18);
+}
+
+/* Label del checkbox */
+.scheduleCheck {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 110px;
+}
+
+/* Input nativo oculto */
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Checkbox visual */
+.checkboxCustom {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid rgba(28,66,232,0.5);
+  background: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.checkboxChecked {
+  background: #1C42E8;
+  border-color: #1C42E8;
+}
+
+.scheduleDay {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Inputs de hora */
+.scheduleTimes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.timeInput {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(28,66,232,0.4);
+  background: #0a1628;
+  color: #fff;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  /* Ocultar el ícono de reloj nativo en algunos navegadores */
+  color-scheme: dark;
+}
+
+.timeInput:focus {
+  border-color: #1C42E8;
+  box-shadow: 0 0 0 3px rgba(28,66,232,0.2);
+}
+
+.timeSep {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+}
+
+.scheduleClosed {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+  flex-shrink: 0;
+}
+/* ─────────────────────────────────────────────────────────────────────────────
+   PARCHE para MisNegocios.module.css
+   Reemplaza/agrega estas clases en tu archivo existente.
+   El resto del CSS permanece igual.
+─────────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Layout principal — 3 columnas ─────────────────────────────────────────
+   sidebar (320px) | editPanel (flex:1) | chatbot (48px colapsado / 320px abierto)
+─────────────────────────────────────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: calc(100vh - 57px); /* altura del header */
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.layoutMobile {
+  flex-direction: column;
+  height: auto;
+  overflow: visible;
+}
+
+/* ─── Sidebar izquierda (sin cambios de tamaño) ─────────────────────────────── */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(28,66,232,0.35);
+  overflow-y: auto;
+  background: #0a1628;
+}
+
+.sidebarMobile {
+  width: 100%;
+  border-right: none;
+  border-bottom: 1px solid rgba(28,66,232,0.35);
+  overflow-y: visible;
+}
+
+/* ─── Panel de edición — columna central ────────────────────────────────────── */
+.editPanel {
+  flex: 1;            /* ocupa todo el espacio sobrante entre sidebar y chat */
+  overflow-y: auto;
+  background: #020c1f;
+  min-width: 0;       /* evita overflow en flex */
+}
+
+.editPanelMobile {
+  min-height: auto;
+}
+
+/* ─── Estado vacío cuando no hay negocio seleccionado ───────────────────────── */
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.42);
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}

@@ -1,0 +1,446 @@
+/* Authpage.module.css — paleta Coppel, valores hardcoded */
+
+/* ─── Body ──────────────────────────────────────────────────────────────────── */
+.body {
+  font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+  background: #020c1f;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%,  rgba(28,66,232,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(28,168,247,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(28,66,232,0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  z-index: 1;
+  background: #020c1f;
+  border: 1px solid rgba(28,66,232,0.35);
+  border-radius: 28px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(8,23,84,0.7);
+  animation: rise .55s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── Hero ──────────────────────────────────────────────────────────────────── */
+.hero {
+  background: #020c1f;
+  border-bottom: 1px solid rgba(28,66,232,0.3);
+  padding: 1.2rem 2rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(28,66,232,0.3);
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(28,66,232,0.15);
+  top: -120px; left: 50%;
+  transform: translateX(-50%);
+}
+
+.logoWrap {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+.logoImg {
+  width: 80px; height: 80px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #0c2060;
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
+  animation: spin-in .6s .1s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+.logoFallback {
+  display: none;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: #0c2060;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
+}
+
+@keyframes spin-in {
+  from { opacity: 0; transform: scale(.6) rotate(-15deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+.brandName {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+  animation: fade-up .4s .2s both;
+  margin-top: .15rem;
+  line-height: 1.2;
+}
+
+.brandBadge {
+  background: #F0D224;
+  color: #081754;
+  padding: 1px 8px 2px;
+  border-radius: 6px;
+  font-size: .9rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+.brandSub {
+  font-size: .72rem;
+  color: rgba(255,255,255,0.42);
+  margin-top: 2px;
+  letter-spacing: .02em;
+  animation: fade-up .4s .28s both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── Tabs ──────────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  padding: 1.2rem 1.5rem .2rem;
+  animation: fade-up .4s .35s both;
+  border: none;
+  background: transparent;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: .55rem;
+  font-size: .85rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.42);
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid rgba(28,66,232,0.3);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  transition: all .25s;
+  user-select: none;
+}
+
+.tab:hover { color: #1CA8F7; }
+
+.activeTab {
+  color: #1CA8F7;
+  border-bottom-color: #1C42E8;
+}
+
+/* ─── User type row ─────────────────────────────────────────────────────────── */
+.typeRow {
+  display: flex;
+  gap: .6rem;
+  padding: 1rem 1.5rem .3rem;
+  animation: fade-up .4s .4s both;
+}
+
+.typeBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .6rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(28,66,232,0.35);
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.42);
+  background: transparent;
+  transition: all .22s;
+  font-family: 'Poppins', sans-serif;
+}
+
+.typeBtn:hover {
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.1);
+}
+
+.sel {
+  border-color: #1C42E8;
+  color: #1CA8F7;
+  background: rgba(28,66,232,0.15);
+}
+
+.selY {
+  border-color: #F0D224;
+  color: #F0D224;
+  background: rgba(240,210,36,0.12);
+}
+
+.ico { font-size: 1.1rem; line-height: 1; }
+
+/* ─── Form ──────────────────────────────────────────────────────────────────── */
+.formBody {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  animation: fade-up .4s .45s both;
+}
+
+.field { display: flex; flex-direction: column; gap: .3rem; }
+
+.label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.inputWrap { position: relative; }
+
+.inputIcon {
+  position: absolute;
+  left: 13px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: rgba(255,255,255,0.4);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon svg { width: 16px; height: 16px; }
+
+/* Inputs más claros sobre el fondo oscuro #020c1f */
+.input {
+  width: 100%;
+  padding: .72rem .9rem .72rem 2.4rem;
+  border: 1.5px solid rgba(28,66,232,0.5);
+  border-radius: 12px;
+  font-size: .9rem;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  background: #1a3a8f;
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.input:focus {
+  border-color: #1C42E8;
+  background: #1e44a8;
+  box-shadow: 0 0 0 3px rgba(28,66,232,0.25);
+}
+
+.input::placeholder { color: rgba(255,255,255,0.45); }
+
+.eyeBtn {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.4);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color .2s;
+}
+
+.eyeBtn:hover { color: #1CA8F7; }
+
+/* ─── Error box ─────────────────────────────────────────────────────────────── */
+.errorBox {
+  background: rgba(255,89,77,0.08);
+  border: 1px solid rgba(255,89,77,0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #FF594D;
+  font-size: 0.82rem;
+}
+
+/* ─── Botón principal ────────────────────────────────────────────────────────── */
+.btnMain {
+  width: 100%;
+  padding: .85rem;
+  border-radius: 14px;
+  border: none;
+  background: #1C42E8;
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  letter-spacing: .01em;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 4px 20px rgba(28,66,232,0.4);
+  margin-top: .2rem;
+}
+
+.btnMain:hover:not(:disabled) {
+  background: #2954ff;
+  box-shadow: 0 6px 20px rgba(28,66,232,0.5);
+}
+
+.btnMain:active:not(:disabled) { transform: scale(.98); }
+.btnMain:disabled { opacity: .7; cursor: not-allowed; }
+
+.yellow {
+  background: #F0D224 !important;
+  color: #081754 !important;
+  box-shadow: 0 4px 16px rgba(240,210,36,0.4) !important;
+}
+
+.yellow:hover:not(:disabled) {
+  background: #ffe44a !important;
+  box-shadow: 0 6px 20px rgba(240,210,36,0.5) !important;
+}
+
+/* ─── Shake ──────────────────────────────────────────────────────────────────── */
+.shake { animation: shake .4s ease !important; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-6px); }
+  40%     { transform: translateX(6px); }
+  60%     { transform: translateX(-4px); }
+  80%     { transform: translateX(4px); }
+}
+
+/* ─── Card footer ─────────────────────────────────────────────────────────── */
+.cardFooter {
+  text-align: center;
+  padding: 0 1.5rem 1.4rem;
+  font-size: .8rem;
+  color: rgba(255,255,255,0.42);
+  animation: fade-up .4s .5s both;
+}
+
+.cardFooter a { color: #1CA8F7; font-weight: 600; text-decoration: none; }
+.cardFooter a:hover { text-decoration: underline; }
+
+/* ─── Password strength ──────────────────────────────────────────────────── */
+.pwStrength { display: flex; gap: 4px; margin-top: 4px; }
+
+.pwBar {
+  height: 3px; flex: 1;
+  border-radius: 99px;
+  background: rgba(28,66,232,0.25);
+  transition: background .3s;
+}
+
+.weak   { background: #FF594D; }
+.fair   { background: #FFAE43; }
+.strong { background: #1C42E8; }
+
+/* ─── Checkbox ───────────────────────────────────────────────────────────── */
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  font-size: .8rem;
+  color: rgba(255,255,255,0.42);
+  line-height: 1.5;
+}
+
+.checkbox {
+  width: 16px !important; height: 16px !important;
+  accent-color: #1C42E8;
+  flex-shrink: 0; margin-top: 2px; cursor: pointer;
+}
+
+.checkRow a { color: #1CA8F7; text-decoration: none; }
+.checkRow a:hover { text-decoration: underline; }
+
+/* ─── Name row ───────────────────────────────────────────────────────────── */
+.nameRow { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .body       { align-items: flex-start; padding: 0; }
+  .card       { border-radius: 0; box-shadow: none; min-height: 100vh; max-width: 100%; }
+  .hero       { padding: .9rem 2rem .8rem; }
+  .logoImg, .logoFallback { width: 64px; height: 64px; }
+  .brandName  { font-size: 1.5rem; margin-top: .1rem; }
+  .brandSub   { font-size: .7rem; margin-top: 1px; }
+  .logoWrap   { margin-bottom: .35rem; }
+  .tabs       { padding: 1rem 1.25rem .2rem; }
+  .typeRow    { padding: .9rem 1.25rem .3rem; gap: .5rem; }
+  .typeBtn    { padding: .55rem .4rem; font-size: .79rem; }
+  .formBody   { padding: .85rem 1.25rem 1.25rem; gap: .7rem; }
+  .nameRow    { grid-template-columns: 1fr; }
+  .input      { font-size: 1rem; padding: .78rem .9rem .78rem 2.4rem; }
+  .btnMain    { padding: .9rem; font-size: 1rem; }
+  .cardFooter { padding: 0 1.25rem 1.6rem; font-size: .82rem; }
+}
+
+@media (min-width: 768px) {
+  .body  { padding: 2rem; align-items: center; min-height: 100vh; }
+  .card  { max-width: 460px; border-radius: 32px; box-shadow: 0 10px 40px rgba(8,23,84,0.8), 0 2px 8px rgba(0,0,0,0.3); }
+  .hero  { padding: 1.4rem 2.5rem 1.1rem; }
+  .logoImg, .logoFallback { width: 88px; height: 88px; }
+  .brandName  { font-size: 1.8rem; }
+  .tabs       { padding: 1.4rem 2rem .25rem; }
+  .typeRow    { padding: 1.1rem 2rem .4rem; }
+  .formBody   { padding: 1.1rem 2rem 1.75rem; gap: .85rem; }
+  .input      { padding: .78rem 1rem .78rem 2.5rem; font-size: .92rem; }
+  .btnMain    { padding: .9rem; font-size: 1rem; border-radius: 16px; }
+  .cardFooter { padding: 0 2rem 1.6rem; font-size: .83rem; }
+}
+
+@media (min-width: 1280px) {
+  .card { max-width: 480px; }
+}
