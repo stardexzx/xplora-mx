@@ -307,6 +307,28 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
                 </button>
               ) : (
                 <div style={{ background: NAVY.surface, padding: "14px", borderRadius: "14px", border: `1px solid ${NAVY.border}` }}>
+                  {/* Star picker */}
+                  <div style={{ display: "flex", gap: "6px", marginBottom: "10px", justifyContent: "center" }}>
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <span
+                        key={star}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        style={{
+                          fontSize: "1.6rem",
+                          cursor: "pointer",
+                          color: star <= (hoverRating || rating) ? "#f59e0b" : NAVY.muted,
+                          transition: "color 0.15s, transform 0.1s",
+                          transform: star <= (hoverRating || rating) ? "scale(1.2)" : "scale(1)",
+                          display: "inline-block",
+                          userSelect: "none",
+                        }}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
                   <textarea 
                     placeholder={t.commentPlaceholder} 
                     value={comment} 
@@ -350,8 +372,51 @@ export default function BusinessPopup({ negocio, onClose, userLocation, onRouteR
               {!userLocation ? (
                 <div style={{ color: NAVY.danger, fontSize: "0.85rem" }}>{t.loginRequired}</div>
               ) : (
-                <div style={{ fontSize: "0.85rem" }}>
-                   {t.selectTransport}
+                <div>
+                  <div style={{ fontSize: "0.85rem", marginBottom: "12px" }}>
+                    {t.selectTransport}
+                  </div>
+                  {/* Botones de modo de transporte */}
+                  <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "16px" }}>
+                    {(["TRANSIT", "WALKING", "DRIVING"] as TravelMode[]).map((mode) => {
+                      const icons: Record<TravelMode, string> = { TRANSIT: "🚌", WALKING: "🚶", DRIVING: "🚗" };
+                      const labels: Record<TravelMode, string> = { TRANSIT: "Transporte", WALKING: "Caminando", DRIVING: "En auto" };
+                      const colors: Record<TravelMode, string> = { TRANSIT: "#1a73e8", WALKING: "#34a853", DRIVING: "#ea4335" };
+                      const isActive = travelMode === mode && routeRequested;
+                      return (
+                        <button
+                          key={mode}
+                          onClick={() => requestRoute(mode)}
+                          style={{
+                            display: "flex", flexDirection: "column", alignItems: "center",
+                            gap: "4px", padding: "10px 14px", borderRadius: "12px", border: "none",
+                            cursor: "pointer", fontSize: "0.75rem", fontWeight: 600,
+                            background: isActive ? colors[mode] : NAVY.surface2,
+                            color: isActive ? "#fff" : NAVY.text2,
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          <span style={{ fontSize: "1.4rem" }}>{icons[mode]}</span>
+                          {labels[mode]}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Resultado de la ruta */}
+                  {routeResult && routeRequested && (
+                    <div style={{ textAlign: "left", fontSize: "0.8rem", color: NAVY.text2, marginTop: "8px" }}>
+                      <div style={{ marginBottom: "8px", fontWeight: 700, color: NAVY.text, fontSize: "0.9rem" }}>
+                        📍 {Math.round(routeResult.distanceMeters / 100) / 10} km ·{" "}
+                        {Math.round(routeResult.durationSeconds / 60)} min
+                      </div>
+                      {routeResult.steps.map((step, i) => (
+                        <div key={i} style={{ padding: "5px 0", borderBottom: `1px solid ${NAVY.border}`, lineHeight: 1.4 }}>
+                          {step.instruction}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -578,19 +578,13 @@ style={{ height: "34px", objectFit: "contain", maxWidth: "110px" }
         </header>
         {/* ══ CATEGORY BAR ══ */}
         <div className="cp-catbar">
-          <button
-            className={`cp-pill${activeCategory === "all" ? " active" : ""}`}
-            onClick={() => handleCategoryChange("all")}
-          >
-            🗺️ {categoryLabels["all"] ?? "Todos"}
-          </button>
           {CATEGORIES.map((c) => (
             <button
               key={c.key}
               className={`cp-pill${activeCategory === c.key ? " active" : ""}`}
               onClick={() => handleCategoryChange(c.key)}
             >
-              {c.emoji} {categoryLabels[c.key]}
+              {c.emoji} {categoryLabels[c.key] ?? c.key}
             </button>
           ))}
         </div>
