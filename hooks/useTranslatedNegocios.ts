@@ -15,10 +15,19 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
   const [translated, setTranslated] = useState<Negocio[]>(negocios);
   const pendingRef = useRef(false);
 
+  // Clave estable: no usamos el array como dependencia directa
+  // sino un string con los IDs — solo cambia cuando cambian los negocios reales
+  const negociosKey = negocios.map(n => n.id).join(",");
+
   useEffect(() => {
-    // 1. Casos base: Español o lista vacía
+    // 1. Casos base: Español o lista vacía — comparar con translated actual para no hacer loop
     if (lang === "es" || negocios.length === 0) {
-      setTranslated(negocios);
+      setTranslated(prev =>
+        prev.length === negocios.length &&
+        prev.every((p, i) => p.id === negocios[i]?.id)
+          ? prev   // sin cambios → no dispara re-render
+          : negocios
+      );
       return;
     }
 
@@ -30,13 +39,12 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
 
       if (toTranslate.length > 0) {
         pendingRef.current = true;
-        
-        // 3. Preparar los textos (4 strings por negocio)
+
         const textsToFetch = toTranslate.flatMap(n => [
           n.description || "",
           n.tags || "",
           n.category || "",
-          n.opening_hours || ""
+          n.opening_hours || "",
         ]);
 
         try {
@@ -45,34 +53,43 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ texts: textsToFetch, lang }),
           });
-          
+
           const data = await res.json();
           const translations: string[] = data.translations || textsToFetch;
 
-          // 4. Guardar resultados en caché
           toTranslate.forEach((n, i) => {
             const baseIndex = i * 4;
             cache.set(`${lang}:${n.id}`, {
-              name: n.name, // El nombre no se traduce según tu comentario
+              name: n.name,
               description: translations[baseIndex] || n.description || "",
               tags: translations[baseIndex + 1] || n.tags || "",
               category: translations[baseIndex + 2] || n.category || "",
-              opening_hours: translations[baseIndex + 3] || n.opening_hours || ""
+              opening_hours: translations[baseIndex + 3] || n.opening_hours || "",
             });
           });
         } catch (error) {
           console.error("Error translating:", error);
-          // Opcional: llenar caché con originales para evitar re-intentos infinitos
+          // Llenar caché con originales para evitar re-intentos infinitos
+          toTranslate.forEach(n => {
+            if (!cache.has(`${lang}:${n.id}`)) {
+              cache.set(`${lang}:${n.id}`, {
+                name: n.name,
+                description: n.description || "",
+                tags: n.tags || "",
+                category: n.category || "",
+                opening_hours: n.opening_hours || "",
+              });
+            }
+          });
         } finally {
           pendingRef.current = false;
         }
       }
 
-      // 5. Construir la lista final combinando datos originales + caché
+      // 3. Construir lista final
       const result = negocios.map((n) => {
         const cached = cache.get(`${lang}:${n.id}`);
         if (!cached) return n;
-        
         return {
           ...n,
           description: cached.description,
@@ -86,7 +103,8 @@ export function useTranslatedNegocios(negocios: Negocio[], lang: string) {
     };
 
     translate();
-  }, [negocios, lang]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [negociosKey, lang]);
 
   return translated;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import ChatbotNegocios from "@/component/ChatbotWidgetNegocios";
+import MenuManager from "@/component/MenuManager";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleMap, Marker } from "@react-google-maps/api";
@@ -115,7 +116,7 @@ export default function MisNegocios() {
 
   // Panel activo: null = lista, string = id del negocio en edición
   const [editingId, setEditingId]       = useState<string | null>(null);
-  const [activeTab, setActiveTab]       = useState<"info" | "fotos" | "resenas" | "crecer">("info");
+  const [activeTab, setActiveTab]       = useState<"info" | "fotos" | "resenas" | "menu" | "crecer">("info");
 
   // Estado del asistente Coppel Emprende
   const [crecerAsesoria, setCrecerAsesoria]     = useState<AsesoriaResult | null>(null);
@@ -601,7 +602,7 @@ export default function MisNegocios() {
 
               {/* Tabs */}
               <div className={s.tabs}>
-                {(["info", "fotos", "resenas", "crecer"] as const).map(tab => (
+                {(["info", "fotos", "resenas", "menu", "crecer"] as const).map(tab => (
                   <button 
                     key={tab} 
                     className={`${s.tab} ${activeTab === tab ? s.tabActive : ""}`}
@@ -612,6 +613,7 @@ export default function MisNegocios() {
                     {tab === "info" ? "Información"
                       : tab === "fotos" ? `Fotos (${currentImages.length})`
                       : tab === "resenas" ? `Reseñas (${reviews.length})`
+                      : tab === "menu" ? "🍽️ Menú"
                       : "💡 Crecer"}
                   </button>
                 ))}
@@ -938,6 +940,10 @@ export default function MisNegocios() {
                       </div>
                     ))}
                   </div>
+                )}
+                {/* ── TAB MENÚ ── */}
+                {activeTab === "menu" && editingNegocio && (
+                  <MenuManager negocio_id={editingNegocio.id} />
                 )}
                 {/* ── TAB CRECER ── */}
                 {activeTab === "crecer" && editingNegocio && (() => {
