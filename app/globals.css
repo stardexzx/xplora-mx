@@ -218,4 +218,73 @@ body {
 @media (max-width: 767px) {
   .input { font-size: 16px !important; }
   .btn   { min-height: 44px; }
+}/* Pin base */
+.map-pin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #d6c90c;
+  color: #222222;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 6px 12px 6px 8px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Flecha inferior */
+.map-pin::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid #000000;
+}
+
+/* Punto interior */
+.map-pin::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #000000;
+  flex-shrink: 0;
+}
+
+/* Hover */
+.map-pin:hover {
+  transform: scale(1.04) translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border-color: rgba(0, 0, 0, 0.22);
+}
+
+.map-pin.active {
+  background: #d4b800;
+  color: #1a1a1a;
+  border-color: #d4b800;
+  box-shadow: 0 4px 16px rgba(208, 180, 0, 0.45);
+}
+
+.map-pin.active::after {
+  border-top-color: #d4b800;
+}
+
+.map-pin.active::before {
+  background: rgba(210, 6, 6, 0.4);
+}
+
+.map-pin:hover {
+  background: #f5d800;
+  border-color: rgba(0, 0, 0, 0.2);
 }

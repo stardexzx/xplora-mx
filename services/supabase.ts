@@ -15,7 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     autoRefreshToken: true,
     detectSessionInUrl: false,  // evita conflictos con Next.js router
     flowType: "pkce",
-    storageKey: "xploramx-auth",  // clave única para evitar conflictos de lock entre tabs/instancias
+    storageKey: "localIA-auth",  // clave única para evitar conflictos de lock entre tabs/instancias
     lock: async (name, acquireTimeout, fn) => {
       // Implementación robusta de lock que no cuelga en Strict Mode
       try {

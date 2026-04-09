@@ -182,7 +182,7 @@ export default function AuthPage() {
             <div className={styles.logoFallback}>🧭</div>
           </div>
           <div className={styles.brandName}>
-            Xplora <span className={styles.brandBadge}>MX</span>
+            Local <span className={styles.brandBadge}>IA</span>
           </div>
           <div className={styles.brandSub}>Conectando turistas con lo auténtico de México</div>
         </div>
@@ -243,7 +243,7 @@ export default function AuthPage() {
               )}
 
               <button className={loginBtnClass} onClick={handleLogin} disabled={loginStatus !== "idle"}>
-                {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Entrar a Xplora MX"}
+                {loginStatus === "loading" ? "Entrando..." : loginStatus === "success" ? "¡Bienvenido!" : "Ingresar"}
               </button>
             </div>
 

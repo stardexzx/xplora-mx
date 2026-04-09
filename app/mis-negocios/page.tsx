@@ -1,5 +1,6 @@
 "use client";
 
+import ChatbotNegocios from "@/component/ChatbotWidgetNegocios";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleMap, Marker } from "@react-google-maps/api";
@@ -7,6 +8,25 @@ import { supabase } from "../../services/supabase";
 import { uploadImage } from "../../services/cloudinary";
 import { useMaps } from "../../context/MapsContext";
 import type { AsesoriaResult, AsesoriaMessage } from "../api/asesoria/route";
+import s from "./MisNegocios.module.css";
+
+// ─── Available tags from API ──────────────────────────────────────────────────
+
+const AVAILABLE_TAGS = [
+  "barato",
+  "lujo",
+  "seguro",
+  "familiar",
+  "romantico",
+  "turistico",
+  "gastronomico",
+  "cultural",
+  "vida nocturna",
+  "al aire libre",
+  "con niños",
+  "pet friendly",
+  "sin gluten",
+];
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -46,6 +66,24 @@ const darkMapStyle = [
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#0d1f18" }] },
   { featureType: "poi", elementType: "geometry", stylers: [{ color: "#111a15" }] },
 ];
+
+// ─── Schedule types and constants ─────────────────────────────────────────────
+
+type WeekSchedule = Record<string, { open: boolean; from: string; to: string }>;
+
+const DEFAULT_SCHEDULE: WeekSchedule = {
+  lunes: { open: true, from: "09:00", to: "20:00" },
+  martes: { open: true, from: "09:00", to: "20:00" },
+  miercoles: { open: true, from: "09:00", to: "20:00" },
+  jueves: { open: true, from: "09:00", to: "20:00" },
+  viernes: { open: true, from: "09:00", to: "20:00" },
+  sabado: { open: true, from: "10:00", to: "18:00" },
+  domingo: { open: false, from: "10:00", to: "18:00" },
+};
+
+const DAYS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+
+const TAGS_OPTIONS = AVAILABLE_TAGS;
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
@@ -98,13 +136,16 @@ export default function MisNegocios() {
   const [editLng, setEditLng]           = useState("");
   const [editMarker, setEditMarker]     = useState<{ lat: number; lng: number } | null>(null);
   const [editCenter, setEditCenter]     = useState({ lat: 19.0414, lng: -98.2063 });
-  const [saving, setSaving]             = useState(false);
-  const [saveMsg, setSaveMsg]           = useState("");
 
-  // Fotos
-  const [currentImages, setCurrentImages] = useState<NegocioImg[]>([]);
-  const [newFiles, setNewFiles]         = useState<File[]>([]);
-  const [newPreviews, setNewPreviews]   = useState<string[]>([]);
+  const [selectedTags, setSelectedTags]   = useState<string[]>([]);
+  const [schedule, setSchedule]           = useState<WeekSchedule>({ ...DEFAULT_SCHEDULE });
+
+  const [saving, setSaving]   = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+
+  const [currentImages, setCurrentImages]     = useState<NegocioImg[]>([]);
+  const [newFiles, setNewFiles]               = useState<File[]>([]);
+  const [newPreviews, setNewPreviews]         = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   // Reseñas
@@ -189,6 +230,10 @@ export default function MisNegocios() {
       })
       .catch(() => setCrecerLoading(false));
   };
+  const toggleTag  = (t: string) => setSelectedTags(p => p.includes(t) ? p.filter(x => x !== t) : [...p, t]);
+  const toggleDay  = (day: string) => setSchedule((p: WeekSchedule) => ({ ...p, [day]: { ...p[day], open: !p[day].open } }));
+  const setDayTime = (day: string, field: "from" | "to", val: string) =>
+    setSchedule((p: WeekSchedule) => ({ ...p, [day]: { ...p[day], [field]: val } }));
 
   const sendCrecer = async (pregunta: string, negocio: Negocio) => {
     if (!pregunta.trim() || crecerLoading) return;
@@ -304,11 +349,10 @@ export default function MisNegocios() {
     const reply = replyText[reviewId]?.trim();
     if (!reply) return;
     setSavingReply(reviewId);
-    const { error } = await supabase.from("reviews")
-      .update({ reply }).eq("id", reviewId);
+    const { error } = await supabase.from("reviews").update({ reply }).eq("id", reviewId);
     if (!error) {
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply } : r));
-      setReplyText(prev => ({ ...prev, [reviewId]: "" }));
+      setReviews(p => p.map(r => r.id === reviewId ? { ...r, reply } : r));
+      setReplyText(p => ({ ...p, [reviewId]: "" }));
     }
     setSavingReply(null);
   };
@@ -468,16 +512,10 @@ export default function MisNegocios() {
       <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "'DM Sans', sans-serif" }}>
 
         {/* HEADER */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: "12px",
-          padding: isMobile ? "12px 16px" : "14px 24px",
-          borderBottom: "1px solid var(--border)",
-          background: "rgba(10,15,13,0.95)", backdropFilter: "blur(12px)",
-          position: "sticky", top: 0, zIndex: 100, flexWrap: "wrap",
-        }}>
-          <button onClick={() => router.push("/")} style={{ display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", cursor: "pointer", color: "var(--text)" }}>
-            <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, var(--teal), var(--teal-dk))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>🌎</div>
-            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.95rem" }}>Xplora<span style={{ background: "var(--orange)", color: "#fff", padding: "1px 6px 2px", borderRadius: "5px", fontSize: "0.68rem", fontWeight: 700, marginLeft: "4px" }}>MX</span></span>
+        <div className={`${s.header} ${isMobile ? s.headerMobile : ""}`}>
+          <button className={s.logoBtn} onClick={() => router.push("/")}>
+            <div className={s.logoIcon}>🌎</div>
+            <span className={s.logoName}>Local<span className={s.logoBadge}>IA</span></span>
           </button>
           <span style={{ color: "var(--border)" }}>/</span>
           <span style={{ color: "var(--muted)", fontSize: "0.9rem", fontWeight: 600 }}>Mis negocios</span>
@@ -491,7 +529,8 @@ export default function MisNegocios() {
           </div>
         </div>
 
-        <div style={{ display: "flex", height: isMobile ? "auto" : "calc(100vh - 57px)", flexDirection: isMobile ? "column" : "row" }}>
+        {/* ── LAYOUT: sidebar | panel | chatbot ── */}
+        <div className={`${s.layout} ${isMobile ? s.layoutMobile : ""}`}>
 
           {/* LISTA DE NEGOCIOS */}
           <div style={{
@@ -505,48 +544,40 @@ export default function MisNegocios() {
             {loadingNegocios ? (
               <p style={{ color: "var(--muted)", padding: "2rem", textAlign: "center" }}>Cargando...</p>
             ) : negocios.length === 0 ? (
-              <div style={{ padding: "2rem", textAlign: "center" }}>
-                <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>No tienes negocios registrados</p>
-                <button className="btn btn-primary" style={{ fontSize: "0.85rem" }} onClick={() => router.push("/dashboard")}>
+              <div className={s.sidebarEmpty}>
+                <p className={s.sidebarEmptyText}>No tienes negocios registrados</p>
+                <button
+                  className={s.btnPrimary}
+                  style={{ fontSize: "0.85rem" }}
+                  onClick={() => router.push("/dashboard")}
+                >
                   Registrar mi primer negocio
                 </button>
               </div>
-            ) : (
-              <div>
-                {negocios.map(n => {
-                  const st = STATUS_LABELS[n.status] ?? STATUS_LABELS.pending;
-                  const isActive = editingId === n.id;
-                  return (
-                    <div key={n.id} onClick={() => openEdit(n)} style={{
-                      display: "flex", gap: "12px", padding: "14px 16px",
-                      borderBottom: "1px solid var(--border)", cursor: "pointer",
-                      background: isActive ? "rgba(29,138,140,0.06)" : "transparent",
-                      borderLeft: isActive ? "3px solid var(--teal)" : "3px solid transparent",
-                      transition: "all 0.15s",
-                    }}>
-                      {/* Thumbnail */}
-                      <div style={{ width: "52px", height: "52px", borderRadius: "8px", overflow: "hidden", flexShrink: 0, background: "var(--surface2)", border: "1px solid var(--border)" }}>
-                        {n.image_url ? (
-                          <img src={n.image_url} alt={n.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem" }}>🏪</div>
-                        )}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: 0, fontWeight: 600, fontSize: "0.9rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.name}</p>
-                        <p style={{ margin: "2px 0 6px", color: "var(--muted)", fontSize: "0.78rem" }}>{n.category}</p>
-                        <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 8px", borderRadius: "10px", background: st.bg, color: st.color }}>
-                          {st.label}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            ) : negocios.map(n => {
+              const st = STATUS_LABELS[n.status] ?? STATUS_LABELS.pending;
+              return (
+                <div
+                  key={n.id}
+                  className={`${s.negocioItem} ${editingId === n.id ? s.negocioItemActive : ""}`}
+                  onClick={() => openEdit(n)}
+                >
+                  <div className={s.negocioThumb}>
+                    {n.image_url ? <img src={n.image_url} alt={n.name} /> : "🏪"}
+                  </div>
+                  <div className={s.negocioInfo}>
+                    <p className={s.negocioName}>{n.name}</p>
+                    <p className={s.negocioCategory}>{n.category}</p>
+                    <span className={s.statusBadge} style={{ background: st.bg, color: st.color }}>
+                      {st.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* PANEL DE EDICIÓN */}
+          {/* PANEL central */}
           {editingNegocio ? (
             <div style={{ flex: 1, overflowY: "auto", background: "var(--bg)", minHeight: isMobile ? "auto" : 0 }}>
 
@@ -556,9 +587,11 @@ export default function MisNegocios() {
                   <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>{editingNegocio.name}</h2>
                   <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.82rem" }}>{editingNegocio.category}</p>
                 </div>
-                <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
-                  <button className="btn btn-danger" style={{ fontSize: "0.8rem", padding: "6px 12px" }}
-                    onClick={() => deleteNegocio(editingNegocio.id, editingNegocio.name)}>
+                <div className={s.editHeaderActions}>
+                  <button
+                    className={s.btnDanger}
+                    onClick={() => deleteNegocio(editingNegocio.id, editingNegocio.name)}
+                  >
                     Eliminar negocio
                   </button>
                   <button className="btn btn-ghost" style={{ fontSize: "0.8rem" }} onClick={closeEdit}>✕</button>
@@ -566,18 +599,15 @@ export default function MisNegocios() {
               </div>
 
               {/* Tabs */}
-              <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--surface)" }}>
+              <div className={s.tabs}>
                 {(["info", "fotos", "resenas", "crecer"] as const).map(tab => (
-                  <button key={tab} onClick={() => {
-                    setActiveTab(tab);
-                    if (tab === "crecer" && editingNegocio) initCrecer(editingNegocio);
-                  }} style={{
-                    padding: "12px 16px", border: "none", background: "transparent",
-                    cursor: "pointer", fontFamily: "inherit", fontWeight: 600, fontSize: "0.82rem",
-                    color: activeTab === tab ? (tab === "crecer" ? "#003087" : "var(--teal)") : "var(--muted)",
-                    borderBottom: activeTab === tab ? `2px solid ${tab === "crecer" ? "#003087" : "var(--teal)"}` : "2px solid transparent",
-                    transition: "all 0.2s",
-                  }}>
+                  <button 
+                    key={tab} 
+                    className={`${s.tab} ${activeTab === tab ? s.tabActive : ""}`}
+                    onClick={() => { setActiveTab(tab);
+                      if (tab === "crecer" && editingNegocio) initCrecer(editingNegocio);
+                    }} 
+                  >
                     {tab === "info" ? "Información"
                       : tab === "fotos" ? `Fotos (${currentImages.length})`
                       : tab === "resenas" ? `Reseñas (${reviews.length})`
@@ -600,45 +630,113 @@ export default function MisNegocios() {
                       <label style={labelStyle}>Categoría</label>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
                         {CATS.map(c => (
-                          <button key={c.value} onClick={() => setEditCategory(c.value)} style={{
-                            padding: "8px 10px", borderRadius: "8px", border: "1px solid",
-                            cursor: "pointer", fontSize: "0.82rem", fontFamily: "inherit",
-                            borderColor: editCategory === c.value ? "var(--teal)" : "var(--border)",
-                            background: editCategory === c.value ? "var(--teal-a)" : "var(--surface2)",
-                            color: editCategory === c.value ? "var(--teal-lt)" : "var(--text)",
-                          }}>{c.label}</button>
+                          <button
+                            key={c.value}
+                            className={`${s.catBtn} ${editCategory === c.value ? s.catBtnActive : ""}`}
+                            onClick={() => setEditCategory(c.value)}
+                          >
+                            {c.label}
+                          </button>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <label style={labelStyle}>Descripción</label>
-                      <textarea className="input" rows={3} value={editDescription}
-                        onChange={e => setEditDescription(e.target.value)} style={{ resize: "vertical" }} />
+                      <label className={s.label}>Descripción</label>
+                      <textarea
+                        className={`${s.input} ${s.textarea}`}
+                        rows={3}
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                      />
+                    </div>
+
+                    {/* ETIQUETAS */}
+                    <div>
+                      <label className={s.label}>Etiquetas</label>
+                      <div className={s.chipGrid}>
+                        {TAGS_OPTIONS.map((tag: string) => (
+                          <button
+                            key={tag}
+                            className={`${s.chip} ${selectedTags.includes(tag) ? s.chipActive : ""}`}
+                            onClick={() => toggleTag(tag)}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                      <p className={s.chipHint}>Selecciona todas las que apliquen a tu negocio</p>
                     </div>
 
                     <div>
-                      <label style={labelStyle}>Etiquetas</label>
-                      <input className="input" placeholder="barato, romántico, familiar..." value={editTags}
-                        onChange={e => setEditTags(e.target.value)} />
+                      <label className={s.label}>Teléfono / WhatsApp</label>
+                      <input
+                        className={s.input}
+                        placeholder="+52 222 123 4567"
+                        value={editPhone}
+                        onChange={e => setEditPhone(e.target.value)}
+                      />
                     </div>
 
                     <div>
-                      <label style={labelStyle}>Teléfono / WhatsApp</label>
-                      <input className="input" placeholder="+52 222 123 4567"
-                        value={editPhone} onChange={e => setEditPhone(e.target.value)} />
+                      <label className={s.label}>Sitio web</label>
+                      <input
+                        className={s.input}
+                        placeholder="www.minegocio.mx"
+                        value={editWebsite}
+                        onChange={e => setEditWebsite(e.target.value)}
+                      />
                     </div>
 
                     <div>
-                      <label style={labelStyle}>Sitio web</label>
-                      <input className="input" placeholder="www.minegocio.mx"
-                        value={editWebsite} onChange={e => setEditWebsite(e.target.value)} />
-                    </div>
-
-                    <div>
-                      <label style={labelStyle}>Horario</label>
-                      <input className="input" placeholder="Lun–Vie 9:00–20:00, Sáb 10:00–18:00"
-                        value={editOpeningHours} onChange={e => setEditOpeningHours(e.target.value)} />
+                      <label className={s.label}>Horario</label>
+                      <div className={s.scheduleList}>
+                        {DAYS.map((day: string) => {
+                          const d = schedule[day];
+                          return (
+                            <div
+                              key={day}
+                              className={`${s.scheduleRow} ${!d.open ? s.scheduleRowClosed : ""}`}
+                            >
+                              <label className={s.scheduleCheck}>
+                                <input
+                                  type="checkbox"
+                                  checked={d.open}
+                                  onChange={() => toggleDay(day)}
+                                  className={s.checkboxInput}
+                                />
+                                <span className={`${s.checkboxCustom} ${d.open ? s.checkboxChecked : ""}`}>
+                                  {d.open && (
+                                    <svg viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 10, height: 10 }}>
+                                      <path d="M1 5L4.5 8.5L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                  )}
+                                </span>
+                                <span className={s.scheduleDay}>{day}</span>
+                              </label>
+                              {d.open ? (
+                                <div className={s.scheduleTimes}>
+                                  <input
+                                    type="time"
+                                    value={d.from}
+                                    onChange={e => setDayTime(day, "from", e.target.value)}
+                                    className={s.timeInput}
+                                  />
+                                  <span className={s.timeSep}>—</span>
+                                  <input
+                                    type="time"
+                                    value={d.to}
+                                    onChange={e => setDayTime(day, "to", e.target.value)}
+                                    className={s.timeInput}
+                                  />
+                                </div>
+                              ) : (
+                                <span className={s.scheduleClosed}>Cerrado</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Mini mapa de ubicación */}
@@ -646,38 +744,62 @@ export default function MisNegocios() {
                       <label style={labelStyle}>Ubicación</label>
                       <div style={{ borderRadius: "10px", overflow: "hidden", border: "1px solid var(--border)", height: "220px", marginBottom: "10px" }}>
                         {mapLoaded ? (
-                          <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }}
-                            center={editCenter} zoom={editMarker ? 15 : 13}
-                            onClick={handleMapClick} options={{ styles: darkMapStyle, zoomControl: true, streetViewControl: false, mapTypeControl: false, fullscreenControl: false }}>
+                          <GoogleMap
+                            mapContainerStyle={{ width: "100%", height: "100%" }}
+                            center={editCenter}
+                            zoom={editMarker ? 15 : 13}
+                            onClick={handleMapClick}
+                            options={{
+                              styles: darkMapStyle,
+                              zoomControl: true,
+                              streetViewControl: false,
+                              mapTypeControl: false,
+                              fullscreenControl: false,
+                            }}
+                          >
                             {editMarker && (
-                              <Marker position={editMarker} draggable onDragEnd={e => {
-                                if (!e.latLng) return;
-                                const lat = parseFloat(e.latLng.lat().toFixed(7));
-                                const lng = parseFloat(e.latLng.lng().toFixed(7));
-                                setEditMarker({ lat, lng }); setEditLat(String(lat)); setEditLng(String(lng));
-                              }} />
+                              <Marker
+                                position={editMarker}
+                                draggable
+                                onDragEnd={e => {
+                                  if (!e.latLng) return;
+                                  const lat = parseFloat(e.latLng.lat().toFixed(7));
+                                  const lng = parseFloat(e.latLng.lng().toFixed(7));
+                                  setEditMarker({ lat, lng });
+                                  setEditLat(String(lat));
+                                  setEditLng(String(lng));
+                                }}
+                              />
                             )}
                           </GoogleMap>
                         ) : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--muted)" }}>Cargando mapa...</div>}
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                         <div>
-                          <label style={{ ...labelStyle, marginBottom: "4px" }}>Latitud</label>
-                          <input className="input" value={editLat} onChange={e => {
-                            setEditLat(e.target.value);
-                            const n = parseFloat(e.target.value);
-                            const lng = parseFloat(editLng);
-                            if (!isNaN(n) && !isNaN(lng)) { setEditMarker({ lat: n, lng }); setEditCenter({ lat: n, lng }); }
-                          }} style={{ fontSize: "0.85rem" }} />
+                          <label className={`${s.label} ${s.labelSm}`}>Latitud</label>
+                          <input
+                            className={s.input}
+                            value={editLat}
+                            style={{ fontSize: "0.85rem" }}
+                            onChange={e => {
+                              setEditLat(e.target.value);
+                              const n = parseFloat(e.target.value), l = parseFloat(editLng);
+                              if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: n, lng: l }); setEditCenter({ lat: n, lng: l }); }
+                            }}
+                          />
                         </div>
                         <div>
-                          <label style={{ ...labelStyle, marginBottom: "4px" }}>Longitud</label>
-                          <input className="input" value={editLng} onChange={e => {
-                            setEditLng(e.target.value);
-                            const n = parseFloat(e.target.value);
-                            const lat = parseFloat(editLat);
-                            if (!isNaN(n) && !isNaN(lat)) { setEditMarker({ lat, lng: n }); setEditCenter({ lat, lng: n }); }
-                          }} style={{ fontSize: "0.85rem" }} />
+                          <label className={`${s.label} ${s.labelSm}`}>Longitud</label>
+                          <input
+                            className={s.input}
+                            value={editLng}
+                            style={{ fontSize: "0.85rem" }}
+                            onChange={e => {
+                              setEditLng(e.target.value);
+                              const n = parseFloat(e.target.value), l = parseFloat(editLat);
+                              if (!isNaN(n) && !isNaN(l)) { setEditMarker({ lat: l, lng: n }); setEditCenter({ lat: l, lng: n }); }
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -697,13 +819,11 @@ export default function MisNegocios() {
 
                 {/* ── TAB FOTOS ── */}
                 {activeTab === "fotos" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                  <div className={s.editForm}>
+                    <p className={s.photosHint}>
                       Tienes {currentImages.length} foto{currentImages.length !== 1 ? "s" : ""}. Máximo 6.
                     </p>
-
-                    {/* Fotos actuales */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
+                    <div className={s.photoGrid}>
                       {currentImages.map((img, i) => (
                         <div key={img.id} style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", border: "1px solid var(--border)" }}>
                           <img src={img.url} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -723,10 +843,10 @@ export default function MisNegocios() {
 
                       {/* Nuevas fotos preview */}
                       {newPreviews.map((src, i) => (
-                        <div key={`new-${i}`} style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", border: "2px dashed var(--teal)", opacity: 0.8 }}>
-                          <img src={src} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          <div style={{ position: "absolute", inset: 0, background: "var(--teal-a)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <span style={{ color: "var(--teal)", fontWeight: 700, fontSize: "0.75rem" }}>Por subir</span>
+                        <div key={`new-${i}`} className={s.photoNew}>
+                          <img src={src} alt="" />
+                          <div className={s.photoNewOverlay}>
+                            <span className={s.photoNewLabel}>Por subir</span>
                           </div>
                         </div>
                       ))}
@@ -743,14 +863,19 @@ export default function MisNegocios() {
                         </div>
                       )}
                     </div>
-
-                    <input ref={fileInputRef} type="file" accept="image/*" multiple
-                      onChange={handleNewFiles} style={{ display: "none" }} />
-
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleNewFiles}
+                      style={{ display: "none" }}
+                    />
                     {newFiles.length > 0 && (
-                      <button className="btn btn-primary" onClick={uploadNewPhotos} disabled={uploadingPhotos}
-                        style={{ width: "100%", padding: "12px" }}>
-                        {uploadingPhotos ? "Subiendo fotos..." : `Subir ${newFiles.length} foto${newFiles.length > 1 ? "s" : ""}`}
+                      <button className={s.btnPrimary} onClick={uploadNewPhotos} disabled={uploadingPhotos}>
+                        {uploadingPhotos
+                          ? "Subiendo fotos..."
+                          : `Subir ${newFiles.length} foto${newFiles.length > 1 ? "s" : ""}`}
                       </button>
                     )}
                   </div>
@@ -758,57 +883,54 @@ export default function MisNegocios() {
 
                 {/* ── TAB RESEÑAS ── */}
                 {activeTab === "resenas" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <div className={s.editForm}>
                     {loadingReviews ? (
-                      <p style={{ color: "var(--muted)" }}>Cargando reseñas...</p>
+                      <p className={s.loadingText}>Cargando reseñas...</p>
                     ) : reviews.length === 0 ? (
-                      <p style={{ color: "var(--muted)", textAlign: "center", padding: "2rem" }}>
+                      <p style={{ color: "rgba(255,255,255,0.42)", textAlign: "center", padding: "2rem" }}>
                         Aún no tienes reseñas
                       </p>
                     ) : reviews.map(review => (
-                      <div key={review.id} className="card" style={{ padding: "1rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-                          <div style={{ display: "flex", gap: "4px" }}>
-                            {[1,2,3,4,5].map(s => (
-                              <div key={s} style={{ width: "12px", height: "12px", borderRadius: "2px", background: s <= review.rating ? "var(--teal)" : "var(--surface2)" }} />
+                      <div key={review.id} className={s.reviewCard}>
+                        <div className={s.reviewTopRow}>
+                          <div className={s.reviewStars}>
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <div
+                                key={star}
+                                className={`${s.reviewStar} ${star <= review.rating ? s.reviewStarFilled : s.reviewStarEmpty}`}
+                              />
                             ))}
-                            <span style={{ fontSize: "0.78rem", color: "var(--muted)", marginLeft: "6px" }}>{review.rating}/5</span>
+                            <span className={s.reviewRatingLabel}>{review.rating}/5</span>
                           </div>
-                          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                            <span style={{ fontSize: "0.72rem", color: "var(--muted)" }}>
+                          <div className={s.reviewActions}>
+                            <span className={s.reviewDate}>
                               {new Date(review.created_at).toLocaleDateString("es-MX")}
                             </span>
-                            <button onClick={() => deleteReview(review.id)} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: "0.75rem" }}>
+                            <button className={s.btnDeleteReview} onClick={() => deleteReview(review.id)}>
                               Eliminar
                             </button>
                           </div>
                         </div>
-
-                        {review.comment && (
-                          <p style={{ margin: "0 0 10px", fontSize: "0.88rem", color: "var(--text)", lineHeight: 1.5 }}>
-                            {review.comment}
-                          </p>
-                        )}
-
-                        {/* Respuesta existente */}
+                        {review.comment && <p className={s.reviewComment}>{review.comment}</p>}
                         {review.reply && (
-                          <div style={{ background: "rgba(29,138,140,0.06)", border: "1px solid var(--teal-a)", borderRadius: "8px", padding: "10px 12px", marginBottom: "8px" }}>
-                            <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--teal)", fontWeight: 600, marginBottom: "4px" }}>Tu respuesta</p>
-                            <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text)" }}>{review.reply}</p>
+                          <div className={s.reviewReply}>
+                            <p className={s.reviewReplyLabel}>Tu respuesta</p>
+                            <p className={s.reviewReplyText}>{review.reply}</p>
                           </div>
                         )}
-
-                        {/* Input respuesta */}
-                        <div style={{ display: "flex", gap: "8px" }}>
-                          <input className="input" placeholder={review.reply ? "Editar respuesta..." : "Responder a esta reseña..."}
+                        <div className={s.reviewReplyRow}>
+                          <input
+                            className={`${s.input} ${s.reviewReplyInput}`}
+                            placeholder={review.reply ? "Editar respuesta..." : "Responder..."}
                             value={replyText[review.id] ?? ""}
-                            onChange={e => setReplyText(prev => ({ ...prev, [review.id]: e.target.value }))}
-                            style={{ flex: 1, fontSize: "0.85rem" }}
+                            onChange={e => setReplyText(p => ({ ...p, [review.id]: e.target.value }))}
                             onKeyDown={e => e.key === "Enter" && saveReply(review.id)}
                           />
-                          <button className="btn btn-primary" style={{ fontSize: "0.82rem", padding: "8px 14px", whiteSpace: "nowrap" }}
+                          <button
+                            className={s.btnPrimarySmall}
                             disabled={savingReply === review.id || !replyText[review.id]?.trim()}
-                            onClick={() => saveReply(review.id)}>
+                            onClick={() => saveReply(review.id)}
+                          >
                             {savingReply === review.id ? "..." : review.reply ? "Editar" : "Responder"}
                           </button>
                         </div>
@@ -994,7 +1116,12 @@ export default function MisNegocios() {
               <p style={{ fontSize: "0.9rem" }}>Selecciona un negocio para editar</p>
             </div>
           )}
-        </div>
+
+          {/* CHATBOT — 3ª columna, solo desktop */}
+          {!isMobile && <ChatbotNegocios />}
+
+        </div>{/* fin layout */}
+
       </div>
     </>
   );
